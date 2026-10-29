@@ -132,12 +132,24 @@ python tools/lighthouse.py             # scores and failing audits for key pages
 
 ## Deploying
 
-Any static host works. On Cloudflare Pages, Netlify or Vercel:
+### Vercel (set up: auto-deploys on every push)
 
-- **Build command:** `pip install -r requirements.txt && python tools/build.py`
-- **Output directory:** `dist`
+`vercel.json` configures everything:
 
-`_headers` (long-term caching of hashed assets) is picked up by Netlify and Cloudflare Pages.
+- **Framework preset: Other.** This is a static site that Python *builds*. Without this, Vercel sees `requirements.txt` and mistakes the project for a Python API.
+- **Build:** `sh tools/vercel-build.sh` creates a temporary virtualenv, installs Jinja2 and runs `tools/build.py`. Vercel serves the `dist/` folder.
+- **No `npm install`:** Node is only used for local Lighthouse audits.
+- **URLs and caching:** `trailingSlash: true` matches the canonical URLs, and hashed `/assets/*` files are cached for a year.
+
+How it behaves:
+
+- A push to `main` deploys **production**.
+- Any other branch or pull request gets its own **preview URL**, which Vercel posts on the PR. Test changes there before merging.
+- Preview URLs require a Vercel login by default. To show a preview to someone, use **Share** on the deployment (a shareable link), or change **Settings → Deployment Protection**.
+- If a deploy still says "No python entrypoint found", set **Settings → Build & Deployment → Framework Preset** to **Other**.
+
+> Vercel's free **Hobby plan is for non-commercial use only**. A live business site needs **Pro** (viewer seats are free).
+> **Cloudflare Pages** and **Netlify** free tiers allow commercial use and also auto-deploy from GitHub. Use build command `pip install -r requirements.txt && python tools/build.py` and output directory `dist`; the generated `_headers` file handles caching there.
 
 ---
 

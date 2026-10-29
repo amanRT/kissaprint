@@ -183,9 +183,10 @@ def clip(text, n=158):
 def build(inline_css=False):
     catalog, images = load_data()
     site = catalog["site"]
-    if DIST.exists():
-        shutil.rmtree(DIST)
-    DIST.mkdir()
+    # Empty dist/ rather than deleting it, so a running dev server or open Explorer window can't block the build.
+    DIST.mkdir(exist_ok=True)
+    for child in DIST.iterdir():
+        shutil.rmtree(child) if child.is_dir() else child.unlink()
     asset = Assets()
 
     # Static files: /assets/** fingerprinted, everything else copied as-is.

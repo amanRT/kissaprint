@@ -8,7 +8,6 @@ Usage:
 import argparse
 import gzip
 import http.server
-import os
 import subprocess
 import sys
 import threading
@@ -112,7 +111,7 @@ def main():
     directory = (ROOT / args.root).resolve()
     if args.watch:
         threading.Thread(target=watch_and_build, daemon=True).start()
-    os.chdir(directory)
+    # No os.chdir() into the served folder: on Windows that would block the rebuild from clearing it.
     server = Server(("127.0.0.1", args.port), partial(Handler, directory=str(directory)))
     print(f"Serving {directory} at http://localhost:{args.port}/")
     server.serve_forever()

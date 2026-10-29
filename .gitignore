@@ -21,3 +21,7 @@ design/source-photos/*.jpg
 Thumbs.db
 .idea/
 .vscode/
+
+# Vercel
+.vercel/
+.buildenv/
