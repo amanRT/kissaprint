@@ -88,7 +88,7 @@
     <div class="section-head"><div class="section-head__text"><span class="eyebrow">How it works</span><h2 class="h2" id="how-title">From camera roll to keepsake in <span class="serif accent">three steps</span></h2></div></div>
     <ol class="steps">
       <li class="step reveal" style="--tint: var(--blush)"><div class="step__top"><span class="step__icon">{{ m.icon("gift") }}</span><span class="step__num" data-num="01" aria-hidden="true"></span></div><h3>Choose your keepsake</h3><p>Memoroids, plaques, magazines, frames and more - {{ products | length }} ways to tell your story.</p></li>
-      <li class="step reveal" style="--tint: var(--sky)"><div class="step__top"><span class="step__icon">{{ m.icon("upload") }}</span><span class="step__num" data-num="02" aria-hidden="true"></span></div><h3>Add your photos</h3><p>Upload from your phone in seconds, or send them on WhatsApp after you order.</p></li>
+      <li class="step reveal" style="--tint: var(--sky)"><div class="step__top"><span class="step__icon">{{ m.icon("upload") }}</span><span class="step__num" data-num="02" aria-hidden="true"></span></div><h3>Add your photos</h3><p>Upload from your phone in seconds, or send them to us after you order.</p></li>
       <li class="step reveal" style="--tint: var(--butter)"><div class="step__top"><span class="step__icon">{{ m.icon("package") }}</span><span class="step__num" data-num="03" aria-hidden="true"></span></div><h3>We print &amp; deliver</h3><p>Printed on premium card, packed gift-ready and dispatched within {{ site.dispatch }}.</p></li>
     </ol>
   </div>
@@ -241,7 +241,7 @@
     <div class="faq__aside">
       <span class="eyebrow">FAQ</span>
       <h2 class="h2" id="faq-title">Questions? <span class="serif accent">Answered.</span></h2>
-      <div class="help-card"><strong>Still unsure about something?</strong><p>Our team replies within a few hours, {{ site.hours }}.</p><a class="btn btn--ghost btn--sm" href="/contact/">Contact us</a></div>
+      <div class="help-card"><strong>Still unsure about something?</strong><p>We're here {{ site.hours }}. Call {{ m.phone_links() }}.</p><a class="btn btn--ghost btn--sm" href="/contact/">Contact us</a></div>
     </div>
     <div class="accordion">
       {%- for f in faqs %}

@@ -59,6 +59,8 @@
   };
   // Store an Indian WhatsApp number as 10 digits (or with 91); wa.me needs the country code.
   const whatsapp = (page.dataset.whatsapp || "").replace(/\D/g, "").replace(/^(?=\d{10}$)/, "91");
+  const phoneLinks = (page.dataset.phones || "").split(",").filter((n) => /^\d{10}$/.test(n))
+    .map((n) => `<a href="tel:+91${n}">+91 ${n.slice(0, 5)} ${n.slice(5)}</a>`).join(" or ");
   const sendPhotosHelp = (orderId) => {
     const mail = `<a href="mailto:${esc(page.dataset.email)}?subject=${encodeURIComponent(`Photos for order ${orderId}`)}">${esc(page.dataset.email)}</a>`;
     const wa = whatsapp ? ` or <a href="https://wa.me/${whatsapp}?text=${encodeURIComponent(`Hi! Sending photos for order ${orderId}`)}" target="_blank" rel="noopener">WhatsApp us</a>` : "";
@@ -95,7 +97,7 @@
           <dl class="co-totals"><div><dt>Subtotal</dt><dd>${inr(o.subtotal)}</dd></div><div><dt>Shipping</dt><dd>${o.shipping ? inr(o.shipping) : "Free"}</dd></div>
           <div class="co-totals__total"><dt>Total</dt><dd>${inr(o.total)}</dd></div></dl></section>
         <aside class="co-card"><h2>Delivering to</h2><address>${esc(a.line1)}<br>${a.line2 ? `${esc(a.line2)}<br>` : ""}${esc(a.city)}, ${esc(a.state)} ${esc(a.pincode)}</address>
-          <h2>Need help?</h2><p>Email <a href="mailto:${esc(page.dataset.email)}?subject=${encodeURIComponent(`Order ${o.id}`)}">${esc(page.dataset.email)}</a> with your order number. Bookmark this page to check on your order any time.</p></aside>
+          <h2>Need help?</h2><p>${phoneLinks ? `Call us 24/7 on ${phoneLinks}, or email` : "Email"} <a href="mailto:${esc(page.dataset.email)}?subject=${encodeURIComponent(`Order ${o.id}`)}">${esc(page.dataset.email)}</a> with your order number. Bookmark this page to check on your order any time.</p></aside>
       </div>`;
     view.hidden = false;
     document.title = `${title} · ${o.id} | KissaPrints`;

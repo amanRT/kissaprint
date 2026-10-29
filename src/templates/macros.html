@@ -29,6 +29,12 @@
 <span class="stars" style="--pct:{{ (rating / 5 * 100) | round(1) }}%"{% if label %} role="img" aria-label="Rated {{ rating }} out of 5"{% else %} aria-hidden="true"{% endif %}></span>
 {%- endmacro -%}
 
+{#- Support numbers from catalog.json: "9876543210" -> "+91 98765 43210", dialled as tel:+919876543210 -#}
+{%- macro phone(n) -%}+91 {{ n[:5] }} {{ n[5:] }}{%- endmacro -%}
+{%- macro phone_links(sep=" or ") -%}
+{%- for n in site.support_phones %}<a href="tel:+91{{ n }}">{{ phone(n) }}</a>{% if not loop.last %}{{ sep }}{% endif %}{% endfor -%}
+{%- endmacro -%}
+
 {%- macro inr(n) -%}₹{{ "{:,}".format(n) }}{%- endmacro -%}
 
 {%- macro price(p, mrp) -%}

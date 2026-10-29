@@ -2,7 +2,7 @@
 {% import "macros.html" as m %}
 {% block content %}
 {#- Rendered by order.js from /api/order/?id=...&t=... (the secret link we give the customer after checkout). -#}
-<div class="wrap order-page" data-order-page data-email="{{ site.email }}" data-whatsapp="{{ site.whatsapp }}" data-dispatch="{{ site.dispatch }}">
+<div class="wrap order-page" data-order-page data-email="{{ site.email }}" data-whatsapp="{{ site.whatsapp }}" data-phones="{{ site.support_phones | join(',') }}" data-dispatch="{{ site.dispatch }}">
   <p class="order-loading" data-order-loading>Loading your order…</p>
   <div class="order-missing" data-order-missing hidden>
     <h1>We couldn't find that order</h1>

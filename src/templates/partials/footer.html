@@ -21,6 +21,10 @@
       <div class="footer__brand">
         <a class="logo" href="/" aria-label="KissaPrints home"><svg class="logo__mark" aria-hidden="true"><use href="#logo-mark"/></svg><span class="logo__word" aria-hidden="true"><em>kissa</em>prints</span></a>
         <p>{{ site.tagline }} Personalised photo gifts, printed with love in India and delivered to your door.</p>
+        <div class="footer__support">
+          <p class="footer__support-title">{{ m.icon("phone") }}<strong>Support 24/7</strong><span>· every day of the week</span></p>
+          <p>{{ m.phone_links(" · ") }}</p>
+        </div>
         <ul class="socials">
           <li><a href="{{ site.social.instagram }}" target="_blank" rel="noopener" aria-label="KissaPrints on Instagram">{{ m.icon("instagram") }}</a></li>
           <li><a href="{{ site.social.youtube }}" target="_blank" rel="noopener" aria-label="KissaPrints on YouTube">{{ m.icon("youtube") }}</a></li>

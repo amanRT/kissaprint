@@ -142,10 +142,18 @@ def load_data():
 
 # ---------------------------------------------------------------- structured data
 def ld_org(site, asset):
-    return {"@context": "https://schema.org", "@type": "OnlineStore", "@id": site["url"] + "/#org",
-            "name": site["name"], "url": site["url"] + "/", "logo": site["url"] + "/icon-512.png",
-            "image": site["url"] + asset("/assets/img/og-default.jpg"), "description": site["description"],
-            "email": site["email"], "areaServed": "IN", "sameAs": list(site["social"].values())}
+    phones = [f"+91-{n}" for n in site.get("support_phones", [])]
+    all_week = {"@type": "OpeningHoursSpecification", "opens": "00:00", "closes": "23:59",
+                "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]}
+    org = {"@context": "https://schema.org", "@type": "OnlineStore", "@id": site["url"] + "/#org",
+           "name": site["name"], "url": site["url"] + "/", "logo": site["url"] + "/icon-512.png",
+           "image": site["url"] + asset("/assets/img/og-default.jpg"), "description": site["description"],
+           "email": site["email"], "areaServed": "IN", "sameAs": list(site["social"].values())}
+    if phones:  # 24/7 customer support lines
+        org["telephone"] = phones[0]
+        org["contactPoint"] = [{"@type": "ContactPoint", "telephone": p, "contactType": "customer support",
+                                "areaServed": "IN", "hoursAvailable": all_week} for p in phones]
+    return org
 
 
 def ld_website(site):

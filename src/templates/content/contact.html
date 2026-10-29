@@ -22,9 +22,10 @@
   </form>
   <aside class="aside-card">
     <h2>Other ways to reach us</h2>
-    <p>{{ m.icon("mail") }} <a href="mailto:{{ site.email }}">{{ site.email }}</a></p>
-    <p>{{ m.icon("clock") }} {{ site.hours }}</p>
-    <p>{{ m.icon("instagram") }} <a href="{{ site.social.instagram }}" target="_blank" rel="noopener">@kissaprints on Instagram</a></p>
-    <p class="note">Add your WhatsApp business number and registered business address here before launch.</p>
+    <p class="contact-line">{{ m.icon("phone") }}<span>{{ m.phone_links() }}</span></p>
+    <p class="contact-line">{{ m.icon("clock") }}<span>Support {{ site.hours }}</span></p>
+    <p class="contact-line">{{ m.icon("mail") }}<a href="mailto:{{ site.email }}">{{ site.email }}</a></p>
+    <p class="contact-line">{{ m.icon("instagram") }}<a href="{{ site.social.instagram }}" target="_blank" rel="noopener">@kissaprints on Instagram</a></p>
+    <p class="note">Add your registered business address here before launch.</p>
   </aside>
 </div>
