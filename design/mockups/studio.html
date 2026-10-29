@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>KissaPrints - mockup studio</title>
+<link rel="stylesheet" href="studio.css">
+</head>
+<body>
+<!--
+  Every <section class="scene" id="..."> is one 600x600 product shot.
+  Open studio.html?grid to preview all of them; tools/render_mockups.py renders each #id at 2x.
+  Photos come from ../source-photos (see design/photos.json).
+-->
+
+<!-- 1. Classic Memoroids: a fan of prints sliding out of a kraft envelope -->
+<section class="scene" id="classic-memoroids">
+  <div class="bg bg-blush"></div>
+  <figure class="pola" style="--r:-18deg; z-index:1"><img src="../source-photos/puppy.jpg" style="object-position:50% 40%" alt=""><figcaption>bruno</figcaption></figure>
+  <figure class="pola" style="--r:-9deg; z-index:2"><img src="../source-photos/friends-picnic.jpg" style="object-position:50% 50%" alt=""><figcaption>girls trip</figcaption></figure>
+  <figure class="pola" style="--r:9deg; z-index:2"><img src="../source-photos/holi-couple.jpg" style="object-position:50% 35%" alt=""><figcaption>holi '26</figcaption></figure>
+  <figure class="pola" style="--r:18deg; z-index:1"><img src="../source-photos/couple-heritage.jpg" style="object-position:55% 40%" alt=""><figcaption>jaipur days</figcaption></figure>
+  <figure class="pola" style="--r:0deg; z-index:3"><img src="../source-photos/couple-saree.jpg" style="object-position:50% 22%" alt=""><figcaption>us, always</figcaption></figure>
+  <div class="envelope">
+    <div class="sticker abs" style="position:absolute; left:40px; top:44px"><b>kissa</b><b>prints</b><small>made with love</small></div>
+    <div class="stamp" style="position:absolute; right:34px; top:70px; text-align:right">10 memoroids<br><span style="letter-spacing:.12em; font-weight:600">classic · 300 gsm</span></div>
+  </div>
+</section>
+
+<!-- 2. Vintage Memoroids: cream prints on twine -->
+<section class="scene" id="vintage-memoroids">
+  <div class="bg bg-cream"></div>
+  <svg class="twine" viewBox="0 0 600 600"><path d="M-20 190 Q 300 320 620 200"/><path class="hi" d="M-20 190 Q 300 320 620 200"/></svg>
+  <figure class="pola vintage" style="--w:176px; left:37px; top:244px; --r:-5deg; --o:50% 0%; z-index:2"><img src="../source-photos/palace-couple.jpg" style="object-position:55% 45%" alt=""><span class="datestamp">'24 11 02</span><figcaption>the palace day</figcaption></figure>
+  <figure class="pola vintage" style="--w:176px; left:212px; top:266px; --r:2deg; --o:50% 0%; z-index:2"><img src="../source-photos/family-newborn.jpg" style="object-position:50% 28%" alt=""><span class="datestamp">'25 06 18</span><figcaption>hello, little one</figcaption></figure>
+  <figure class="pola vintage" style="--w:176px; left:387px; top:250px; --r:6deg; --o:50% 0%; z-index:2"><img src="../source-photos/sunset.jpg" style="object-position:45% 55%" alt=""><span class="datestamp">'25 12 31</span><figcaption>last sunset</figcaption></figure>
+  <i class="peg" style="left:117px; top:216px; --r:-5deg"></i>
+  <i class="peg" style="left:292px; top:236px; --r:2deg"></i>
+  <i class="peg" style="left:467px; top:220px; --r:6deg"></i>
+</section>
+
+<!-- 3. Insta Memoroids -->
+<section class="scene" id="insta-memoroids">
+  <div class="bg bg-lilac"></div>
+  <div class="insta" style="left:42px; top:60px; --r:-7deg">
+    <div class="hd"><span class="av"><img src="../source-photos/her-portrait.jpg" style="object-position:50% 25%" alt=""></span><div><div class="un">the.chai.gang</div><div class="loc">Bandra, Mumbai</div></div><span class="dots">···</span></div>
+    <img class="ph" src="../source-photos/friends-cafe.jpg" style="object-position:50% 40%" alt="">
+    <div class="act">
+      <svg class="like" viewBox="0 0 24 24"><path d="M12 20.5s-7.4-4.5-9.6-9C.9 8.4 2.7 4.8 6.3 4.8c2.2 0 3.8 1.3 5.7 3.4 1.9-2.1 3.5-3.4 5.7-3.4 3.6 0 5.4 3.6 3.9 6.7-2.2 4.5-9.6 9-9.6 9z"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M20.5 11.6a8.4 8.4 0 0 1-12.3 7.5L3 20.5l1.5-5A8.4 8.4 0 1 1 20.5 11.6z"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M21.5 3.5 10.6 13.4M21.5 3.5l-6.9 17-4-7.1-7.1-4z"/></svg>
+      <svg class="save" viewBox="0 0 24 24"><path d="M18.5 21 12 16.3 5.5 21V4.5A1.5 1.5 0 0 1 7 3h10a1.5 1.5 0 0 1 1.5 1.5z"/></svg>
+    </div>
+    <div class="likes">1,284 likes</div>
+    <div class="cap"><b>the.chai.gang</b> same table, same jokes, 6 years later</div>
+    <div class="more">View all 92 comments</div>
+  </div>
+  <div class="insta" style="left:270px; top:148px; --r:6deg">
+    <div class="hd"><span class="av"><img src="../source-photos/couple-sweet.jpg" style="object-position:62% 30%" alt=""></span><div><div class="un">aarav.and.meera</div><div class="loc">Udaipur, Rajasthan</div></div><span class="dots">···</span></div>
+    <img class="ph" src="../source-photos/couple-sweet.jpg" style="object-position:62% 40%" alt="">
+    <div class="act">
+      <svg class="like" viewBox="0 0 24 24"><path d="M12 20.5s-7.4-4.5-9.6-9C.9 8.4 2.7 4.8 6.3 4.8c2.2 0 3.8 1.3 5.7 3.4 1.9-2.1 3.5-3.4 5.7-3.4 3.6 0 5.4 3.6 3.9 6.7-2.2 4.5-9.6 9-9.6 9z"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M20.5 11.6a8.4 8.4 0 0 1-12.3 7.5L3 20.5l1.5-5A8.4 8.4 0 1 1 20.5 11.6z"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M21.5 3.5 10.6 13.4M21.5 3.5l-6.9 17-4-7.1-7.1-4z"/></svg>
+      <svg class="save" viewBox="0 0 24 24"><path d="M18.5 21 12 16.3 5.5 21V4.5A1.5 1.5 0 0 1 7 3h10a1.5 1.5 0 0 1 1.5 1.5z"/></svg>
+    </div>
+    <div class="likes">2,481 likes</div>
+    <div class="cap"><b>aarav.and.meera</b> five years of us</div>
+    <div class="more">View all 146 comments</div>
+  </div>
+</section>
+
+<!-- 4. Photo booth strips -->
+<section class="scene" id="photo-booth-strips">
+  <div class="bg bg-sky"></div>
+  <div class="strip" style="left:148px; top:62px; --r:-9deg; z-index:1">
+    <img src="../source-photos/couple-laugh.jpg" style="object-position:55% 40%" alt="">
+    <img src="../source-photos/couple-couch.jpg" style="object-position:50% 45%" alt="">
+    <img src="../source-photos/holi-couple.jpg" style="object-position:50% 35%" alt="">
+    <img src="../source-photos/couple-beach.jpg" style="object-position:50% 40%" alt="">
+    <div class="foot">kissaprints · 14.02.26</div>
+  </div>
+  <div class="strip dark" style="left:300px; top:56px; --r:10deg; z-index:2">
+    <img src="../source-photos/friends-cafe.jpg" style="object-position:50% 40%" alt="">
+    <img src="../source-photos/holi-friends.jpg" style="object-position:40% 40%" alt="">
+    <img src="../source-photos/kids-street.jpg" style="object-position:40% 40%" alt="">
+    <img src="../source-photos/friends-picnic.jpg" style="object-position:50% 50%" alt="">
+    <div class="foot">best. day. ever.</div>
+  </div>
+</section>
+
+<!-- 5. Song glass plaque -->
+<section class="scene" id="song-plaque">
+  <div class="wall" style="background: radial-gradient(90% 90% at 30% 20%, #f6f1ff, #ddd1fb)"></div>
+  <div class="ledge wood"></div>
+  <div class="plaque">
+    <img class="ph" src="../source-photos/couple-sweet.jpg" style="object-position:62% 40%" alt="">
+    <div class="song">Tum Se Hi</div>
+    <div class="artist">Mohit Chauhan · Jab We Met</div>
+    <div class="bar"></div>
+    <div class="times"><span>1:58</span><span>5:21</span></div>
+    <div class="ctl">
+      <svg viewBox="0 0 24 24"><path d="M12 20.5s-7.4-4.5-9.6-9C.9 8.4 2.7 4.8 6.3 4.8c2.2 0 3.8 1.3 5.7 3.4 1.9-2.1 3.5-3.4 5.7-3.4 3.6 0 5.4 3.6 3.9 6.7-2.2 4.5-9.6 9-9.6 9z" fill="none" stroke="#1b1414" stroke-width="2"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M6 5h2.2v14H6zM9.5 12 19 5v14z"/></svg>
+      <svg class="play" viewBox="0 0 40 40"><circle cx="20" cy="20" r="20"/><path d="M16 12.5v15l12-7.5z" fill="#fff"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M15.8 5H18v14h-2.2zM14.5 12 5 19V5z"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2zM17 17H7v-3l-4 4 4 4v-3h12v-6h-2z"/></svg>
+    </div>
+    <div class="code" data-code="14"><span class="disc"></span></div>
+  </div>
+  <div class="stand wood"></div>
+</section>
+
+<!-- 6. Star map poster -->
+<section class="scene" id="star-map">
+  <div class="wall" style="background: radial-gradient(90% 90% at 30% 20%, #fff8df, #f6e2a8)"></div>
+  <div class="ledge wood"></div>
+  <div class="frame black" style="left:150px; top:66px; width:300px; height:410px; --fw:10px">
+    <div class="mat" style="--mat:18px">
+      <div class="poster">
+        <svg viewBox="-100 -100 200 200" data-starmap="7"><circle class="ring" r="99"/></svg>
+        <div class="t1">THE NIGHT WE MET</div>
+        <div class="t2">Udaipur, Rajasthan</div>
+        <div class="t3">14 FEBRUARY 2024 · 9:40 PM<br>24.5854° N, 73.7125° E</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. Personalised magazine -->
+<section class="scene" id="personalised-magazine">
+  <div class="bg bg-peach"></div>
+  <div class="mag red" style="left:250px; top:58px; --r:7deg">
+    <img src="../source-photos/couple-heritage.jpg" style="object-position:55% 40%" alt="">
+    <div class="mast">Kissa</div>
+    <div class="issue"><span>VOL. 04</span><span>THE TRAVEL ISSUE</span></div>
+  </div>
+  <div class="mag" style="left:118px; top:118px; --r:-5deg">
+    <img src="../source-photos/wedding.jpg" style="object-position:50% 26%" alt="">
+    <div class="mast">Kissa</div>
+    <div class="issue"><span>VOL. 05</span><span>THE ANNIVERSARY ISSUE</span></div>
+    <div class="lines">
+      <span class="ex">EXCLUSIVE</span>
+      <h3>Aarav &amp; Meera</h3>
+      <p>5 years, 1,826 days &amp; the proposal story nobody knew</p>
+    </div>
+    <div class="barcode" data-barcode="5"></div>
+  </div>
+</section>
+
+<!-- 8. Custom newspaper -->
+<section class="scene" id="custom-newspaper">
+  <div class="bg bg-mint"></div>
+  <article class="news">
+    <div class="mh">The Kissa Times</div>
+    <div class="rule"></div>
+    <div class="dl"><span>Vol. I · No. 7</span><span>Sunday, 14 February 2027</span><span>Special Edition</span></div>
+    <div class="hl">She said yes!</div>
+    <p class="sub">After seven years, two cities and one very nervous ring, Rohan finally asks the question</p>
+    <div class="body">
+      <figure><img src="../source-photos/couple-couch.jpg" style="object-position:50% 40%" alt=""><figcaption>The happy couple at home in Chandigarh, minutes after the big moment.</figcaption></figure>
+      <div class="col"><b>How it all began</b><p>It started with a borrowed umbrella outside a college canteen in 2020. Nobody, least of all Simran, expected the boy who forgot his own birthday to plan the perfect surprise.</p><p>Friends confirm the ring was hidden inside a box of her favourite kaju katli for three whole weeks.</p></div>
+    </div>
+    <div class="cols2"><p>Families from both sides gathered for an impromptu celebration that stretched late into the night, with dancing, dessert and at least four speeches that made everyone cry. The couple plans a winter wedding. Readers are advised to keep their dancing shoes ready and their calendars clear. More photos and the full story continue on page two, along with an exclusive interview with the dog, who reportedly knew all along.</p></div>
+  </article>
+</section>
+
+<!-- 9. Memories calendar 2027 -->
+<section class="scene" id="memories-calendar-2027">
+  <div class="bg bg-mint"></div>
+  <div class="cal-stand"></div>
+  <div class="cal">
+    <div class="rings"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <img class="ph" src="../source-photos/couple-heritage.jpg" style="object-position:55% 40%" alt="">
+    <div class="mo"><b>January</b><span>2027</span></div>
+    <div class="days" data-cal="2027-01" data-mark="14"></div>
+  </div>
+</section>
+
+<!-- 10. Acrylic fridge magnets -->
+<section class="scene" id="acrylic-fridge-magnets">
+  <div class="fridge"></div>
+  <div class="handle"></div>
+  <div class="magnet" style="left:70px; top:70px; --r:-6deg"><img src="../source-photos/couple-saree.jpg" style="object-position:50% 22%" alt=""></div>
+  <div class="magnet" style="left:296px; top:58px; --r:5deg"><img src="../source-photos/puppy.jpg" style="object-position:50% 40%" alt=""></div>
+  <div class="magnet heart" style="left:82px; top:300px; transform:rotate(-5deg)"><img src="../source-photos/holi-couple.jpg" style="object-position:50% 35%" alt=""></div>
+  <div class="magnet" style="left:300px; top:292px; --r:7deg"><img src="../source-photos/friends-picnic.jpg" style="object-position:50% 50%" alt=""></div>
+</section>
+
+<!-- 11. Photo metal keychain -->
+<section class="scene" id="photo-metal-keychain">
+  <div class="bg bg-sky"></div>
+  <div class="key" style="left:94px; top:200px; --r:-12deg">
+    <span class="hole"></span>
+    <span class="ring" style="position:absolute; left:52px; top:-52px"></span>
+    <img src="../source-photos/couple-saree.jpg" style="object-position:50% 20%" alt="">
+    <span class="gloss"></span>
+  </div>
+  <div class="key back" style="left:318px; top:178px; --r:10deg">
+    <span class="hole"></span>
+    <span class="ring" style="position:absolute; left:52px; top:-52px"></span>
+    <div class="engr">
+      <svg viewBox="0 0 24 24"><path d="M12 20.5s-7.4-4.5-9.6-9C.9 8.4 2.7 4.8 6.3 4.8c2.2 0 3.8 1.3 5.7 3.4 1.9-2.1 3.5-3.4 5.7-3.4 3.6 0 5.4 3.6 3.9 6.7-2.2 4.5-9.6 9-9.6 9z"/></svg>
+      <b>you &amp; me</b>
+      <span>14 · 02 · 2024</span>
+    </div>
+  </div>
+</section>
+
+<!-- 12. Oak photo frame -->
+<section class="scene" id="wooden-photo-frame">
+  <div class="wall" style="background: radial-gradient(90% 90% at 30% 20%, #fbf3e8, #ecdcc6)"></div>
+  <div class="ledge" style="background: linear-gradient(180deg, #f4ede3, #e6dacb)"></div>
+  <div class="frame oak" style="left:112px; top:124px; width:262px; height:352px; --fw:18px">
+    <div class="mat" style="--mat:22px"><img src="../source-photos/family-newborn.jpg" style="object-position:50% 25%" alt=""></div>
+  </div>
+  <div class="frame black" style="left:364px; top:262px; width:160px; height:214px; --fw:9px">
+    <div class="mat" style="--mat:14px"><img src="../source-photos/palace-couple.jpg" style="object-position:55% 45%; filter:grayscale(1) contrast(1.05)" alt=""></div>
+  </div>
+</section>
+
+<!-- 13. Love boarding pass -->
+<section class="scene" id="boarding-pass-card">
+  <div class="bg bg-lilac"></div>
+  <div class="pass" style="left:44px; top:96px; --r:-8deg; --pc:#d7263d">
+    <div class="main">
+      <div class="top"><svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg>LOVE AIRLINES<small>BOARDING PASS</small></div>
+      <div class="in">
+        <div class="lbl">Passengers</div><div class="val">AARAV &amp; MEERA</div>
+        <div class="route"><div><b>DEL</b><span>New Delhi</span></div><svg viewBox="0 0 24 24" style="transform:rotate(90deg)"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg><div style="text-align:right"><b>GOI</b><span>Goa</span></div></div>
+        <div class="row"><div><div class="lbl">Flight</div><div class="val">KP 1402</div></div><div><div class="lbl">Date</div><div class="val">14 FEB</div></div><div><div class="lbl">Gate</div><div class="val">05</div></div><div><div class="lbl">Seat</div><div class="val">2A · 2B</div></div></div>
+      </div>
+    </div>
+    <div class="stub"><div><div class="lbl">Boarding</div><div class="val" style="font-size:20px">18:40</div><div class="lbl" style="margin-top:8px">Class</div><div class="val">Forever</div></div><div class="bc" data-barcode="9"></div></div>
+  </div>
+  <div class="pass" style="left:106px; top:316px; --r:5deg; --pc:#4b39c8">
+    <div class="main">
+      <div class="top"><svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg>FRIENDSHIP AIR<small>BOARDING PASS</small></div>
+      <div class="in">
+        <div class="lbl">Passengers</div><div class="val">THE CHAI GANG (x5)</div>
+        <div class="route"><div><b>BLR</b><span>Bengaluru</span></div><svg viewBox="0 0 24 24" style="transform:rotate(90deg)"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg><div style="text-align:right"><b>IXL</b><span>Leh</span></div></div>
+        <div class="row"><div><div class="lbl">Flight</div><div class="val">KP 0618</div></div><div><div class="lbl">Date</div><div class="val">18 JUN</div></div><div><div class="lbl">Gate</div><div class="val">B4</div></div><div><div class="lbl">Seat</div><div class="val">ANY</div></div></div>
+      </div>
+    </div>
+    <div class="stub"><div><div class="lbl">Boarding</div><div class="val" style="font-size:20px">05:15</div><div class="lbl" style="margin-top:8px">Class</div><div class="val">Bestie</div></div><div class="bc" data-barcode="21"></div></div>
+  </div>
+</section>
+
+<!-- 14. Affection box hamper -->
+<section class="scene" id="affection-gift-hamper">
+  <div class="bg bg-blush"></div>
+  <div class="lid"></div>
+  <div class="box">
+    <div class="inner">
+      <figure class="pola" style="--w:124px; left:20px; top:34px; --r:-14deg"><img src="../source-photos/couple-beach.jpg" style="object-position:50% 40%" alt=""><figcaption>goa</figcaption></figure>
+      <figure class="pola" style="--w:124px; left:58px; top:26px; --r:-2deg"><img src="../source-photos/couple-saree.jpg" style="object-position:50% 22%" alt=""><figcaption>us</figcaption></figure>
+      <div class="strip" style="width:96px; padding:7px 7px 0; left:206px; top:14px; --r:12deg">
+        <img src="../source-photos/couple-laugh.jpg" style="width:82px; height:62px; margin-bottom:5px; object-position:55% 40%" alt="">
+        <img src="../source-photos/holi-couple.jpg" style="width:82px; height:62px; margin-bottom:5px; object-position:50% 35%" alt="">
+        <img src="../source-photos/couple-couch.jpg" style="width:82px; height:62px; margin-bottom:5px; object-position:50% 45%" alt="">
+        <div class="foot" style="height:18px; font-size:6px">kissaprints</div>
+      </div>
+      <div class="magnet" style="width:100px; height:100px; border-radius:16px; padding:4px; left:300px; top:26px; --r:-9deg"><img src="../source-photos/puppy.jpg" style="object-position:50% 40%; border-radius:12px" alt=""></div>
+      <div class="card-note" style="left:196px; top:196px; --r:-5deg"><b>Happy Anniversary</b><span>love you, always</span></div>
+      <div class="key" style="width:84px; height:122px; border-radius:16px; padding:22px 6px 6px; left:62px; top:200px; --r:16deg"><span class="hole" style="top:6px; width:11px; height:11px; margin-left:-5.5px"></span><img src="../source-photos/family-newborn.jpg" style="object-position:50% 25%; border-radius:11px" alt=""></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Brand assets (rendered at their own size, 1x) ===== -->
+
+<!-- Social share image 1200x630 -->
+<section class="scene brand" id="og" data-kind="brand" style="width:1200px; height:630px">
+  <div class="bg" style="background: radial-gradient(70% 110% at 82% 40%, #ffd9de 0%, #fff1ea 50%, #fff9f3 100%)"></div>
+  <div class="og-copy">
+    <div class="og-logo"><svg viewBox="0 0 64 64" class="og-mark"><use href="#mark"/></svg><span><em>kissa</em>prints</span></div>
+    <h1>Personalised photo gifts for every <em>kissa</em>.</h1>
+    <p>Polaroids · Photo strips · Song plaques · Star maps · Magazines</p>
+    <div class="og-url">kissaprints.com</div>
+  </div>
+  <figure class="pola" style="--w:236px; left:928px; top:34px; --r:8deg; z-index:2"><img src="../source-photos/friends-picnic.jpg" style="object-position:50% 50%" alt=""><figcaption>girls trip</figcaption></figure>
+  <figure class="pola" style="--w:300px; left:690px; top:128px; --r:-5deg; z-index:3"><img src="../source-photos/couple-saree.jpg" style="object-position:50% 22%" alt=""><figcaption>us, always</figcaption></figure>
+  <figure class="pola" style="--w:206px; left:972px; top:338px; --r:11deg; z-index:4"><img src="../source-photos/puppy.jpg" style="object-position:50% 40%" alt=""><figcaption>bruno</figcaption></figure>
+</section>
+
+<!-- App icon 512x512 (full bleed; platforms apply their own mask) -->
+<section class="scene brand" id="icon" data-kind="brand" style="width:512px; height:512px">
+  <svg viewBox="0 0 64 64" style="inset:0; width:512px; height:512px"><rect width="64" height="64" fill="#d7263d"/><g transform="translate(32 32) scale(.86) translate(-32 -32)"><use href="#mark-art"/></g></svg>
+</section>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <g id="mark-art">
+      <g transform="rotate(-8 32 32)">
+        <rect x="15" y="10" width="34" height="43" rx="3" fill="#fff"/>
+        <rect x="19" y="14" width="26" height="26" rx="1.5" fill="#ffd9de"/>
+        <path d="M32 36s-7.6-4.5-7.6-9.4c0-2.5 1.9-4.4 4.3-4.4 1.4 0 2.6.7 3.3 1.9.7-1.2 1.9-1.9 3.3-1.9 2.4 0 4.3 1.9 4.3 4.4 0 4.9-7.6 9.4-7.6 9.4z" fill="#d7263d"/>
+      </g>
+    </g>
+    <g id="mark"><rect width="64" height="64" rx="16" fill="#d7263d"/><use href="#mark-art"/></g>
+  </defs>
+</svg>
+
+<script src="studio.js"></script>
+</body>
+</html>

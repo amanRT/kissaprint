@@ -1,0 +1,14 @@
+{
+  "name": "KissaPrints - Personalised Photo Gifts",
+  "short_name": "KissaPrints",
+  "description": "Personalised photo gifts printed in India.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fff9f3",
+  "theme_color": "#d7263d",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

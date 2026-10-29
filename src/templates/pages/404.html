@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% import "macros.html" as m %}
+{% block content %}
+<div class="wrap notfound">
+  <figure class="polaroid"><div class="blank" aria-hidden="true">404</div><figcaption>this page went missing</figcaption></figure>
+  <h1>This page wandered off.</h1>
+  <p>Like that one photo you swear you took but can't find. Let's get you somewhere lovely instead.</p>
+  <div class="hero__ctas" style="justify-content: center; margin-top: 8px">
+    <a class="btn btn--kiss" href="/">Back to home {{ m.icon("arrow-right", "icon--arrow") }}</a>
+    <a class="btn btn--ghost" href="/shop/">Shop all gifts</a>
+  </div>
+</div>
+{% endblock %}

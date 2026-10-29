@@ -1,0 +1,272 @@
+{
+  "_note": "Single source of truth for site content. Ratings, review counts, reviews and customer numbers are PLACEHOLDERS - replace with real data before launch.",
+
+  "site": {
+    "name": "KissaPrints",
+    "url": "https://kissaprints.com",
+    "tagline": "Your stories, printed.",
+    "description": "Personalised photo gifts made in India: polaroid-style Memoroids, photo booth strips, song plaques, star maps, magazines, calendars and gift hampers - printed on premium paper and delivered across India.",
+    "email": "hello@kissaprints.com",
+    "whatsapp": "",
+    "hours": "Mon-Sat, 10am-7pm IST",
+    "free_shipping_over": 699,
+    "dispatch": "48 hours",
+    "delivery": "5-7 working days",
+    "social": {
+      "instagram": "https://www.instagram.com/kissaprints/",
+      "youtube": "https://www.youtube.com/@kissaprints",
+      "facebook": "https://www.facebook.com/kissaprints"
+    },
+    "proof": { "customers": "10,000+", "rating": "4.9", "reviews": "2,000+" }
+  },
+
+  "categories": [
+    { "slug": "memoroids", "name": "Memoroids", "sub": "Polaroid-style prints", "image": "classic-memoroids",
+      "intro": "Polaroid-style photo prints on thick 300 GSM card - classic white, vintage cream or Instagram-style frames. Made for walls, journals, fairy-light strings and every gift box.",
+      "seo": "Personalised Polaroid Prints Online in India" },
+    { "slug": "photo-strips", "name": "Photo Strips", "sub": "Booth-style strips", "image": "photo-booth-strips",
+      "intro": "Four-frame photo booth strips in colour or classic black and white. Perfect for friendships, trips and the people who make you laugh.",
+      "seo": "Custom Photo Booth Strips" },
+    { "slug": "song-plaques", "name": "Song Plaques", "sub": "Scan-to-play", "image": "song-plaque",
+      "intro": "Your photo and your song on a glossy acrylic plaque with a scannable song code. The gift that plays your story.",
+      "seo": "Personalised Song Plaques with Scannable Code" },
+    { "slug": "star-maps", "name": "Star Maps", "sub": "Your night sky", "image": "star-map",
+      "intro": "The exact night sky from the date and place that mattered - a first date, a wedding, a birthday - as a minimal print or framed poster.",
+      "seo": "Custom Star Map Posters" },
+    { "slug": "magazines", "name": "Magazines", "sub": "Be the cover star", "image": "personalised-magazine",
+      "intro": "Glossy, fully designed magazines starring your photos and stories. We design it, you approve the preview, we print it.",
+      "seo": "Personalised Photo Magazines" },
+    { "slug": "newspapers", "name": "Newspapers", "sub": "Front-page news", "image": "custom-newspaper",
+      "intro": "Your love story, birthday or big announcement as front-page news in The Kissa Times.",
+      "seo": "Customised Newspaper Gifts" },
+    { "slug": "calendars", "name": "Calendars", "sub": "2027 is here", "image": "memories-calendar-2027",
+      "intro": "Twelve months of your favourite photos, with birthdays and anniversaries marked in red. Desk and wall formats.",
+      "seo": "Personalised Photo Calendars 2027" },
+    { "slug": "fridge-magnets", "name": "Fridge Magnets", "sub": "Acrylic & glossy", "image": "acrylic-fridge-magnets",
+      "intro": "Rounded, glossy acrylic photo magnets in squares and hearts - a little smile every time someone opens the fridge.",
+      "seo": "Acrylic Photo Fridge Magnets" },
+    { "slug": "keychains", "name": "Keychains", "sub": "Steel, engraved", "image": "photo-metal-keychain",
+      "intro": "Stainless steel photo keychains with your words engraved on the back. Carry your people everywhere.",
+      "seo": "Personalised Photo Keychains" },
+    { "slug": "frames", "name": "Frames", "sub": "Real wood", "image": "wooden-photo-frame",
+      "intro": "Solid wood frames with a soft white mount, printed and fitted with your photo - ready for a shelf or a wall.",
+      "seo": "Personalised Wooden Photo Frames" },
+    { "slug": "boarding-passes", "name": "Boarding Passes", "sub": "Trip surprises", "image": "boarding-pass-card",
+      "intro": "Ticket-style keepsakes to announce a trip, a proposal or simply say 'pack your bags'.",
+      "seo": "Personalised Boarding Pass Cards" },
+    { "slug": "hampers", "name": "Hampers", "sub": "Ready to gift", "image": "affection-gift-hamper",
+      "intro": "Curated boxes of personalised keepsakes, wrapped with a handwritten note and ready to hand over.",
+      "seo": "Personalised Gift Hampers" }
+  ],
+
+  "occasions": [
+    { "slug": "for-couples", "name": "For Couples", "sub": "Anniversaries, proposals & 'just because'", "image": "occ-couples",
+      "intro": "Anniversary, proposal or a random Tuesday - personalised gifts that tell your love story, from song plaques to star maps.",
+      "seo": "Personalised Gifts for Couples" },
+    { "slug": "for-her", "name": "For Her", "sub": "Girlfriend, wife, sister, bestie", "image": "occ-her",
+      "intro": "Thoughtful, personalised gifts for the women in your life - Memoroids, magazines, song plaques and more.",
+      "seo": "Personalised Gifts for Her" },
+    { "slug": "for-him", "name": "For Him", "sub": "Boyfriend, husband, brother", "image": "occ-him",
+      "intro": "Keepsakes he'll actually keep - engraved keychains, song plaques, magazines and photo prints.",
+      "seo": "Personalised Gifts for Him" },
+    { "slug": "for-friends", "name": "For Friends", "sub": "Trips, birthdays & farewells", "image": "occ-friends",
+      "intro": "Photo strips, Insta Memoroids and boarding passes for the group chat that became family.",
+      "seo": "Personalised Gifts for Friends" },
+    { "slug": "for-parents", "name": "For Parents", "sub": "Birthdays & anniversaries", "image": "occ-parents",
+      "intro": "Frames, calendars and newspapers that turn family memories into something they'll display with pride.",
+      "seo": "Personalised Gifts for Parents" }
+  ],
+
+  "products": [
+    { "slug": "classic-memoroids", "name": "Classic Memoroids", "category": "memoroids",
+      "meta": "Set of 10 · 3.5 × 4.2 in", "price": 249, "mrp": 349, "rating": 4.9, "reviews": 2140,
+      "badges": ["bestseller"], "tags": ["couples", "her", "him", "friends", "parents"], "photos": 10,
+      "short": "Polaroid-style prints with a crisp white border and space for a handwritten caption.",
+      "description": "Our signature print. Each Memoroid is printed on thick 300 GSM card with a soft matte finish, then trimmed into the classic instant-camera shape - with a wide bottom border for your caption. Stick them on a wall, string them up with fairy lights or slip them into a gift.",
+      "options": [
+        { "name": "Pack size", "values": [{ "label": "10 prints", "price": 249 }, { "label": "20 prints", "price": 449 }, { "label": "30 prints", "price": 599 }] },
+        { "name": "Finish", "values": [{ "label": "Matte" }, { "label": "Glossy" }] }
+      ],
+      "specs": [["Print size", "3.5 × 4.2 in (photo 3.1 × 3.1 in)"], ["Paper", "300 GSM premium card"], ["Finish", "Matte or glossy"], ["Caption", "Printed for you, or left blank to write on"]],
+      "gallery": ["classic-memoroids", "ugc-wall", "ugc-instax"] },
+
+    { "slug": "vintage-memoroids", "name": "Vintage Memoroids", "category": "memoroids",
+      "meta": "Set of 10 · cream border, film tone", "price": 279, "mrp": 399, "rating": 4.8, "reviews": 1320,
+      "badges": [], "tags": ["couples", "parents", "friends"], "photos": 10,
+      "short": "Warm, faded film tones on a cream border, finished with a retro date stamp.",
+      "description": "For memories that deserve a little nostalgia. We apply a hand-tuned film tone to every photo, print it on cream-toned 300 GSM card and add an optional orange date stamp, just like the instant cameras of the 90s.",
+      "options": [
+        { "name": "Pack size", "values": [{ "label": "10 prints", "price": 279 }, { "label": "20 prints", "price": 499 }, { "label": "30 prints", "price": 649 }] },
+        { "name": "Date stamp", "values": [{ "label": "Add date stamp" }, { "label": "No stamp" }] }
+      ],
+      "specs": [["Print size", "3.5 × 4.2 in"], ["Paper", "300 GSM cream card"], ["Tone", "Hand-tuned vintage film"], ["Date stamp", "Optional, your dates"]],
+      "gallery": ["vintage-memoroids", "ugc-hanging", "ugc-table"] },
+
+    { "slug": "insta-memoroids", "name": "Insta Memoroids", "category": "memoroids",
+      "meta": "Set of 8 · Instagram-style frames", "price": 299, "mrp": 449, "rating": 4.8, "reviews": 860,
+      "badges": ["new"], "tags": ["friends", "couples", "her"], "photos": 8,
+      "short": "Your favourite posts as prints - username, likes and caption included.",
+      "description": "Turn the feed into something you can hold. Send us your photos with the username, location and caption you want, and we'll print each one as a crisp Instagram-style post on thick card.",
+      "options": [
+        { "name": "Pack size", "values": [{ "label": "8 prints", "price": 299 }, { "label": "16 prints", "price": 549 }] }
+      ],
+      "specs": [["Print size", "3.5 × 5 in"], ["Paper", "300 GSM card"], ["Details", "Username, location, likes & caption"], ["Finish", "Matte"]],
+      "gallery": ["insta-memoroids", "ugc-hand"] },
+
+    { "slug": "photo-booth-strips", "name": "Photo Booth Strips", "category": "photo-strips",
+      "meta": "Set of 4 strips · 2 × 6 in", "price": 199, "mrp": 299, "rating": 4.8, "reviews": 970,
+      "badges": ["bestseller"], "tags": ["friends", "couples"], "photos": 16,
+      "short": "Four-frame photo booth strips in colour, or classic black and white.",
+      "description": "The photo booth moment, minus the queue. Each strip holds four of your photos with a custom footer line - your names, a date or an inside joke. Choose colour on white, or black and white on a black strip.",
+      "options": [
+        { "name": "Style", "values": [{ "label": "Colour on white" }, { "label": "B&W on black" }] },
+        { "name": "Pack size", "values": [{ "label": "4 strips", "price": 199 }, { "label": "8 strips", "price": 349 }] }
+      ],
+      "specs": [["Strip size", "2 × 6 in"], ["Frames", "4 photos per strip"], ["Paper", "300 GSM card"], ["Footer", "Custom text"]],
+      "gallery": ["photo-booth-strips", "ugc-frames"] },
+
+    { "slug": "song-plaque", "name": "Song Glass Plaque", "category": "song-plaques",
+      "meta": "Acrylic · scannable song code · stand", "price": 549, "mrp": 799, "rating": 4.9, "reviews": 1860,
+      "badges": ["bestseller"], "tags": ["couples", "her", "him"], "photos": 1,
+      "short": "Your photo and your song on a glossy acrylic plaque - scan the code to play it.",
+      "description": "Pick the song that's yours, add a photo and we print both on a crystal-clear acrylic plaque with a scannable song code. It comes with a wooden stand, ready for a desk or bedside table.",
+      "options": [
+        { "name": "Size", "values": [{ "label": "5 × 7 in", "price": 549 }, { "label": "8 × 10 in", "price": 849 }] }
+      ],
+      "specs": [["Material", "3 mm cast acrylic"], ["Stand", "Wooden, included"], ["Code", "Scannable song code"], ["Sizes", "5 × 7 in or 8 × 10 in"]],
+      "gallery": ["song-plaque", "pola-couple"] },
+
+    { "slug": "star-map", "name": "Star Map Poster", "category": "star-maps",
+      "meta": "Your date & place · A4", "price": 449, "mrp": 699, "rating": 4.8, "reviews": 640,
+      "badges": [], "tags": ["couples", "parents"], "photos": 0,
+      "short": "The exact night sky from the moment that mattered - as a print or framed poster.",
+      "description": "Tell us the date, time and place, and we'll plot the stars exactly as they were - with your own title and coordinates. Minimal, meaningful and lovely in any room.",
+      "options": [
+        { "name": "Format", "values": [{ "label": "Print only", "price": 449 }, { "label": "With black frame", "price": 799 }] }
+      ],
+      "specs": [["Size", "A4 (8.3 × 11.7 in)"], ["Paper", "250 GSM matte art paper"], ["Includes", "Title, place, date & coordinates"], ["Frame", "Optional black frame"]],
+      "gallery": ["star-map", "ugc-bedroom"] },
+
+    { "slug": "personalised-magazine", "name": "Personalised Magazine", "category": "magazines",
+      "meta": "8 pages · A4 glossy", "price": 599, "mrp": 899, "rating": 4.9, "reviews": 520,
+      "badges": ["bestseller"], "tags": ["couples", "her", "him", "parents"], "photos": 12,
+      "short": "Make them the cover star - your photos and stories in a glossy magazine.",
+      "description": "Send us photos, a few little stories and inside jokes. Our designers turn them into a real magazine - cover lines, features and all - and share a preview for your approval before we print.",
+      "options": [
+        { "name": "Pages", "values": [{ "label": "8 pages", "price": 599 }, { "label": "16 pages", "price": 899 }, { "label": "24 pages", "price": 1199 }] }
+      ],
+      "specs": [["Size", "A4"], ["Paper", "170 GSM gloss, 250 GSM cover"], ["Design", "Done for you, preview before print"], ["Photos", "8-30 depending on pages"]],
+      "gallery": ["personalised-magazine"] },
+
+    { "slug": "custom-newspaper", "name": "The Kissa Times Newspaper", "category": "newspapers",
+      "meta": "4 pages · newsprint style", "price": 549, "mrp": 799, "rating": 4.7, "reviews": 310,
+      "badges": [], "tags": ["couples", "parents", "friends"], "photos": 6,
+      "short": "Your love story, birthday or big news as a front-page headline.",
+      "description": "Extra, extra! We write and design a newspaper about your people - headline, photos, columns and all - printed on newsprint-style paper and folded like the real thing.",
+      "options": [
+        { "name": "Pages", "values": [{ "label": "2 pages", "price": 449 }, { "label": "4 pages", "price": 549 }] }
+      ],
+      "specs": [["Size", "A3, folded"], ["Paper", "Newsprint-style 80 GSM"], ["Design", "Written and designed for you"], ["Photos", "3-8"]],
+      "gallery": ["custom-newspaper"] },
+
+    { "slug": "memories-calendar-2027", "name": "Memories Calendar 2027", "category": "calendars",
+      "meta": "12 months · desk or wall", "price": 699, "mrp": 999, "rating": 4.9, "reviews": 410,
+      "badges": ["new"], "tags": ["parents", "couples", "him", "her"], "photos": 12,
+      "short": "A year of your favourite photos, with your special days marked in red.",
+      "description": "Twelve photos, twelve months and every birthday and anniversary marked for you. Choose a desk calendar on a kraft stand or a wall calendar with wire binding.",
+      "options": [
+        { "name": "Type", "values": [{ "label": "Desk", "price": 699 }, { "label": "Wall", "price": 799 }] }
+      ],
+      "specs": [["Months", "January-December 2027"], ["Paper", "300 GSM matte"], ["Binding", "Wire-o"], ["Special dates", "Up to 12 marked"]],
+      "gallery": ["memories-calendar-2027"] },
+
+    { "slug": "acrylic-fridge-magnets", "name": "Acrylic Fridge Magnets", "category": "fridge-magnets",
+      "meta": "Set of 4 · 2.5 × 2.5 in", "price": 389, "mrp": 550, "rating": 4.8, "reviews": 780,
+      "badges": [], "tags": ["friends", "parents", "couples"], "photos": 4,
+      "short": "Glossy, rounded acrylic magnets - squares or hearts - for every fridge in the family.",
+      "description": "Each magnet is printed behind 3 mm of glossy acrylic with softly rounded edges and a strong magnet on the back. Mix squares and hearts to build your own little gallery.",
+      "options": [
+        { "name": "Shape", "values": [{ "label": "Square" }, { "label": "Heart" }, { "label": "Mixed" }] },
+        { "name": "Pack size", "values": [{ "label": "4 magnets", "price": 389 }, { "label": "8 magnets", "price": 699 }] }
+      ],
+      "specs": [["Size", "2.5 × 2.5 in"], ["Material", "3 mm glossy acrylic"], ["Back", "Strong ceramic magnet"], ["Shapes", "Square or heart"]],
+      "gallery": ["acrylic-fridge-magnets"] },
+
+    { "slug": "photo-metal-keychain", "name": "Photo Metal Keychain", "category": "keychains",
+      "meta": "Stainless steel · engraved back", "price": 349, "mrp": 499, "rating": 4.7, "reviews": 450,
+      "badges": [], "tags": ["him", "her", "couples"], "photos": 1,
+      "short": "Carry them everywhere - your photo on the front, your words engraved on the back.",
+      "description": "A rust-proof stainless steel keychain with your photo sealed under a protective gloss on the front and your words laser-engraved on the back. The one gift that goes everywhere with them.",
+      "options": [
+        { "name": "Back side", "values": [{ "label": "Engraved text", "price": 349 }, { "label": "Second photo", "price": 379 }] }
+      ],
+      "specs": [["Size", "1.6 × 2.4 in"], ["Material", "Stainless steel"], ["Front", "Photo with gloss coat"], ["Back", "Laser engraving or photo"]],
+      "gallery": ["photo-metal-keychain"] },
+
+    { "slug": "wooden-photo-frame", "name": "Oak Photo Frame", "category": "frames",
+      "meta": "6 × 8 in · real wood · table or wall", "price": 599, "mrp": 899, "rating": 4.8, "reviews": 530,
+      "badges": [], "tags": ["parents", "couples"], "photos": 1,
+      "short": "A solid oak frame with a soft white mount - your photo printed and fitted.",
+      "description": "We print your photo on archival paper, mount it on a soft white mat and fit it into a solid wood frame with a stand and wall hook. It arrives ready to display.",
+      "options": [
+        { "name": "Size", "values": [{ "label": "6 × 8 in", "price": 599 }, { "label": "8 × 10 in", "price": 799 }] },
+        { "name": "Colour", "values": [{ "label": "Natural oak" }, { "label": "Black" }] }
+      ],
+      "specs": [["Frame", "Solid wood, 18 mm"], ["Glazing", "Shatter-resistant acrylic"], ["Print", "Archival matte paper"], ["Mounting", "Stand + wall hook"]],
+      "gallery": ["wooden-photo-frame", "ugc-frames"] },
+
+    { "slug": "boarding-pass-card", "name": "Love Boarding Pass", "category": "boarding-passes",
+      "meta": "Set of 2 · 7.5 × 3 in", "price": 149, "mrp": 249, "rating": 4.8, "reviews": 690,
+      "badges": [], "tags": ["couples", "friends"], "photos": 0,
+      "short": "Announce a trip, a proposal or a 'yes' with a personalised boarding pass.",
+      "description": "Your names, your route, your date and a seat that says 'forever'. Printed on thick card with a tear-off stub - the most fun way to say 'pack your bags'.",
+      "options": [
+        { "name": "Pack size", "values": [{ "label": "2 passes", "price": 149 }, { "label": "6 passes", "price": 349 }] }
+      ],
+      "specs": [["Size", "7.5 × 3 in"], ["Paper", "350 GSM card"], ["Details", "Names, route, date, seat"], ["Stub", "Perforated tear-off"]],
+      "gallery": ["boarding-pass-card"] },
+
+    { "slug": "affection-gift-hamper", "name": "Affection Box Hamper", "category": "hampers",
+      "meta": "5 keepsakes · wrapped with a note", "price": 1299, "mrp": 1899, "rating": 4.9, "reviews": 280,
+      "badges": ["bestseller"], "tags": ["her", "him", "couples", "parents"], "photos": 12,
+      "short": "Our most-gifted box - five personalised keepsakes, wrapped and ready to give.",
+      "description": "Memoroids, a photo strip, a fridge magnet, a photo keychain and a handwritten note, nestled in a kraft gift box with crinkle paper and a ribbon. Everything personalised, nothing for you to wrap.",
+      "options": [
+        { "name": "Box", "values": [{ "label": "Kraft box", "price": 1299 }, { "label": "Premium red box", "price": 1499 }] }
+      ],
+      "specs": [["Includes", "6 Memoroids, 1 photo strip, 1 magnet, 1 keychain, 1 note"], ["Box", "Kraft or premium red"], ["Note", "Handwritten by our team"], ["Ready to gift", "Yes - wrapped with ribbon"]],
+      "gallery": ["affection-gift-hamper", "gift-box"] }
+  ],
+
+  "reviews": [
+    { "name": "Ananya R.", "city": "Pune", "product": "classic-memoroids", "rating": 5, "tint": "blush",
+      "text": "Ordered 30 Memoroids for my boyfriend's birthday and he actually teared up. The card is thick and the colours are so much sharper than I expected." },
+    { "name": "Rohit S.", "city": "Bengaluru", "product": "song-plaque", "rating": 5, "tint": "lilac",
+      "text": "Got the song plaque for our first anniversary. The code really scans and plays our song, and the packaging felt properly premium." },
+    { "name": "Simran K.", "city": "Delhi", "product": "personalised-magazine", "rating": 5, "tint": "peach",
+      "text": "They designed a whole magazine from my photos and silly notes. My parents show it to every relative who visits." },
+    { "name": "Aditya M.", "city": "Mumbai", "product": "photo-booth-strips", "rating": 5, "tint": "sky",
+      "text": "Made strips from our college trip for the whole gang. Reached Mumbai in five days and we're already ordering again for a farewell." },
+    { "name": "Meera J.", "city": "Jaipur", "product": "star-map", "rating": 5, "tint": "butter",
+      "text": "The star map from the night my daughter was born. Minimal, beautiful and the frame is solid. Exactly what I imagined." },
+    { "name": "Kabir D.", "city": "Kolkata", "product": "affection-gift-hamper", "rating": 4, "tint": "mint",
+      "text": "Perfect last-minute gift. It arrived wrapped with a handwritten note - all I had to do was hand it over and take the credit." }
+  ],
+
+  "faqs": [
+    { "q": "How do I send you my photos?",
+      "a": "Upload them on the product page while ordering - straight from your phone or laptop. Prefer chatting? Place your order and send your photos to us on WhatsApp or email with your order number." },
+    { "q": "How long will my order take to arrive?",
+      "a": "We print and dispatch within 48 hours. Delivery usually takes 5-7 working days across India depending on your pincode, and you'll get a tracking link by SMS and email." },
+    { "q": "Will I see a preview before you print?",
+      "a": "Yes, for designed products like magazines, newspapers and calendars we share a digital preview for your approval first. Prints, magnets and frames go straight to print so they reach you faster." },
+    { "q": "What if my photos aren't high quality?",
+      "a": "Our team checks every photo before printing. If something looks blurry or too dark to print well, we'll get in touch and help you pick a better one." },
+    { "q": "Which payment methods do you accept?",
+      "a": "UPI, debit and credit cards, net banking and popular wallets - all processed through a secure, encrypted payment gateway." },
+    { "q": "Do you take bulk or corporate orders?",
+      "a": "Yes! We create bulk orders from 25 units for weddings, events and teams, with custom branding and packaging. Share your requirement on our Bulk orders page for a quote within one working day." },
+    { "q": "What if something arrives damaged?",
+      "a": "It's rare, but if anything arrives damaged or misprinted, send us a photo within 48 hours of delivery and we'll reprint it free of charge." }
+  ]
+}

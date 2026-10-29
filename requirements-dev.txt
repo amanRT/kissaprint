@@ -1,0 +1,10 @@
+# Site build
+-r requirements.txt
+
+# Asset pipeline: product mockups, photo crops, font subsetting
+Pillow>=11.2
+fonttools>=4.55
+brotli>=1.1
+
+# Visual QA screenshots + mockup rendering (drives Chrome)
+selenium>=4.20

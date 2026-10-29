@@ -1,0 +1,50 @@
+{%- import "macros.html" as m -%}
+<!doctype html>
+<html lang="en-IN" data-search="{{ asset('/assets/search.json') }}" data-free-ship="{{ site.free_shipping_over }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{ page.title }}</title>
+<meta name="description" content="{{ page.description }}">
+<link rel="canonical" href="{{ site.url }}{{ page.path }}">
+{%- if page.noindex %}
+<meta name="robots" content="noindex, follow">
+{%- endif %}
+<meta name="theme-color" content="#fff9f3">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="preload" href="{{ asset('/assets/fonts/bricolage.woff2') }}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{{ asset('/assets/fonts/instrument-serif-italic.woff2') }}" as="font" type="font/woff2" crossorigin>
+{%- block preload %}{% endblock %}
+{%- if inline_css %}
+<style>{{ inline_css | safe }}</style>
+{%- else %}
+<link rel="stylesheet" href="{{ asset('/assets/css/main.css') }}">
+{%- endif %}
+<meta property="og:type" content="{{ page.og_type or 'website' }}">
+<meta property="og:site_name" content="{{ site.name }}">
+<meta property="og:locale" content="en_IN">
+<meta property="og:title" content="{{ page.og_title or page.title }}">
+<meta property="og:description" content="{{ page.description }}">
+<meta property="og:url" content="{{ site.url }}{{ page.path }}">
+<meta property="og:image" content="{{ site.url }}{{ page.og_image or asset('/assets/img/og-default.jpg') }}">
+<meta property="og:image:alt" content="{{ page.og_image_alt or 'KissaPrints personalised photo gifts' }}">
+<meta name="twitter:card" content="summary_large_image">
+{%- for ld in page.jsonld %}
+<script type="application/ld+json">{{ ld | tojson }}</script>
+{%- endfor %}
+</head>
+<body{% if page.body_class %} class="{{ page.body_class }}"{% endif %}>
+<a class="skip-link" href="#main">Skip to content</a>
+{% include "partials/icons.html" %}
+{% include "partials/header.html" %}
+<main id="main">
+{% block content %}{% endblock %}
+</main>
+{% include "partials/footer.html" %}
+{% include "partials/dialogs.html" %}
+<script src="{{ asset('/assets/js/main.js') }}" defer></script>
+</body>
+</html>

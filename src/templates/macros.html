@@ -1,0 +1,74 @@
+{#- Shared building blocks. Import with: {% import "macros.html" as m %} -#}
+
+{%- macro icon(name, cls="") -%}
+<svg class="icon{{ ' ' ~ cls if cls }}" aria-hidden="true" focusable="false"><use href="#i-{{ name }}"/></svg>
+{%- endmacro -%}
+
+{%- macro srcset(im, ext, widths=None) -%}
+{%- for w in im.widths if not widths or w in widths -%}{{ asset(im.src ~ '-' ~ w ~ '.' ~ ext) }} {{ w }}w{{ ', ' if not loop.last }}{%- endfor -%}
+{%- endmacro -%}
+
+{#- Responsive <picture> with AVIF + WebP. priority=True for the LCP image (no lazy-load, high fetch priority). -#}
+{%- macro picture(name, alt, sizes="100vw", priority=False, cls="", widths=None, attrs="") -%}
+{%- set im = images[name] -%}
+{%- set ws = im.widths | select("in", widths or im.widths) | list -%}
+{%- set fallback = ws[(ws | length) // 2] -%}
+<picture>
+<source type="image/avif" srcset="{{ srcset(im, 'avif', ws) }}" sizes="{{ sizes }}">
+<img src="{{ asset(im.src ~ '-' ~ fallback ~ '.webp') }}" srcset="{{ srcset(im, 'webp', ws) }}" sizes="{{ sizes }}" width="{{ im.width }}" height="{{ im.height }}" alt="{{ alt }}"{% if priority %} fetchpriority="high"{% else %} loading="lazy"{% endif %} decoding="async"{% if cls %} class="{{ cls }}"{% endif %}{% if attrs %} {{ attrs | safe }}{% endif %}>
+</picture>
+{%- endmacro -%}
+
+{#- Plain WebP <img> for tiny thumbnails (avatars, swatches, cart, menu). -#}
+{%- macro img(name, alt, sizes, w=None, h=None, cls="", eager=False) -%}
+{%- set im = images[name] -%}
+<img src="{{ asset(im.src ~ '-' ~ im.widths[0] ~ '.webp') }}" srcset="{{ srcset(im, 'webp') }}" sizes="{{ sizes }}" width="{{ w or im.width }}" height="{{ h or im.height }}" alt="{{ alt }}"{% if not eager %} loading="lazy"{% endif %} decoding="async"{% if cls %} class="{{ cls }}"{% endif %}>
+{%- endmacro -%}
+
+{%- macro stars(rating, label=True) -%}
+<span class="stars" style="--pct:{{ (rating / 5 * 100) | round(1) }}%"{% if label %} role="img" aria-label="Rated {{ rating }} out of 5"{% else %} aria-hidden="true"{% endif %}></span>
+{%- endmacro -%}
+
+{%- macro inr(n) -%}₹{{ "{:,}".format(n) }}{%- endmacro -%}
+
+{%- macro price(p, mrp) -%}
+<p class="price"><span class="price__now">{{ inr(p) }}</span>{% if mrp and mrp > p %} <s class="price__was"><span class="sr-only">MRP </span>{{ inr(mrp) }}</s> <span class="price__off">{{ ((mrp - p) / mrp * 100) | round | int }}% off</span>{% endif %}</p>
+{%- endmacro -%}
+
+{%- macro badges(p) -%}
+{%- if p.badges -%}<div class="card__badges">{% for b in p.badges %}<span class="badge badge--{{ b }}">{{ {"bestseller": "Bestseller", "new": "New"}[b] }}</span>{% endfor %}</div>{%- endif -%}
+{%- endmacro -%}
+
+{%- macro product_card(p, hidden=False, sizes="(min-width: 1360px) 310px, (min-width: 1100px) 23vw, (min-width: 768px) 31vw, 46vw", priority=False) -%}
+<article class="card" data-tags="{{ p.filter_tags }}" data-price="{{ p.price }}" data-rating="{{ p.rating }}" data-search="{{ (p.name ~ ' ' ~ p.category_name ~ ' ' ~ p.tags | join(' ')) | lower }}"{% if hidden %} hidden{% endif %}>
+  <div class="card__media">
+    {{ picture(p.slug, p.name ~ " - " ~ p.meta, sizes=sizes, priority=priority) }}
+    {{ badges(p) }}
+    <span class="card__quick" aria-hidden="true">Personalise {{ icon("arrow-right") }}</span>
+  </div>
+  <button class="wish" type="button" aria-pressed="false" aria-label="Save {{ p.name }} to wishlist" data-wish="{{ p.slug }}">{{ icon("heart") }}</button>
+  <div class="card__body">
+    <h3 class="card__title"><a href="{{ p.url }}">{{ p.name }}</a></h3>
+    <p class="card__meta">{{ p.meta }}</p>
+    <p class="rating">{{ stars(p.rating, label=False) }}<span class="sr-only">Rated {{ p.rating }} out of 5 from {{ "{:,}".format(p.reviews) }} reviews</span><span aria-hidden="true"><b>{{ p.rating }}</b> ({{ "{:,}".format(p.reviews) }})</span></p>
+    {{ price(p.price, p.mrp) }}
+  </div>
+</article>
+{%- endmacro -%}
+
+{%- macro breadcrumbs(items) -%}
+<nav class="breadcrumbs" aria-label="Breadcrumb"><ol>{% for label, url in items %}<li>{% if loop.last %}<span aria-current="page">{{ label }}</span>{% else %}<a href="{{ url }}">{{ label }}</a>{% endif %}</li>{% endfor %}</ol></nav>
+{%- endmacro -%}
+
+{%- macro review_card(r) -%}
+{%- set p = products_by_slug[r.product] -%}
+<li class="review">
+  {{ stars(r.rating) }}
+  <blockquote><p>“{{ r.text }}”</p></blockquote>
+  <div class="review__who">
+    <span class="avatar" style="--tint: var(--{{ r.tint }})" aria-hidden="true">{{ r.name[0] }}</span>
+    <div><strong>{{ r.name }}</strong><span>{{ r.city }} · <span class="verified">{{ icon("check") }} Verified buyer</span></span></div>
+  </div>
+  <a class="review__product" href="{{ p.url }}">{{ img(p.slug, "", "46px", 46, 46) }}<span>{{ p.name }}</span></a>
+</li>
+{%- endmacro -%}

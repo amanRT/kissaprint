@@ -1,0 +1,59 @@
+{%- import "macros.html" as m -%}
+{%- set popular = [
+  ("Personalised gifts for girlfriend", "/gifts/for-her/"),
+  ("Anniversary gifts for couples", "/gifts/for-couples/"),
+  ("Custom polaroid prints", "/collections/memoroids/"),
+  ("Song plaque with photo", "/collections/song-plaques/"),
+  ("Star map gift", "/collections/star-maps/"),
+  ("Customised magazine", "/collections/magazines/"),
+  ("Photo booth strips", "/collections/photo-strips/"),
+  ("Photo calendar 2027", "/collections/calendars/"),
+  ("Gifts for best friend", "/gifts/for-friends/"),
+  ("Gifts for parents", "/gifts/for-parents/"),
+  ("Photo keychain", "/collections/keychains/"),
+  ("Photo fridge magnets", "/collections/fridge-magnets/"),
+  ("Diwali gift hampers", "/collections/hampers/"),
+  ("Corporate gifting", "/bulk-orders/"),
+] -%}
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <a class="logo" href="/" aria-label="KissaPrints home"><svg class="logo__mark" aria-hidden="true"><use href="#logo-mark"/></svg><span class="logo__word" aria-hidden="true"><em>kissa</em>prints</span></a>
+        <p>{{ site.tagline }} Personalised photo gifts, printed with love in India and delivered to your door.</p>
+        <ul class="socials">
+          <li><a href="{{ site.social.instagram }}" target="_blank" rel="noopener" aria-label="KissaPrints on Instagram">{{ m.icon("instagram") }}</a></li>
+          <li><a href="{{ site.social.youtube }}" target="_blank" rel="noopener" aria-label="KissaPrints on YouTube">{{ m.icon("youtube") }}</a></li>
+          <li><a href="{{ site.social.facebook }}" target="_blank" rel="noopener" aria-label="KissaPrints on Facebook">{{ m.icon("facebook") }}</a></li>
+          <li><a href="mailto:{{ site.email }}" aria-label="Email KissaPrints">{{ m.icon("mail") }}</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h2>Shop</h2>
+        <ul>{% for c in categories[:7] %}<li><a href="{{ c.url }}">{{ c.name }}</a></li>{% endfor %}<li><a href="/shop/">All gifts</a></li></ul>
+      </div>
+      <div class="footer__col">
+        <h2>Gifts for</h2>
+        <ul>{% for o in occasions %}<li><a href="{{ o.url }}">{{ o.name | replace("For ", "") }}</a></li>{% endfor %}<li><a href="/collections/hampers/">Gift hampers</a></li><li><a href="/bulk-orders/">Bulk &amp; corporate</a></li></ul>
+      </div>
+      <div class="footer__col">
+        <h2>Help</h2>
+        <ul><li><a href="/track-order/">Track your order</a></li><li><a href="/shipping/">Shipping &amp; delivery</a></li><li><a href="/returns/">Returns &amp; reprints</a></li><li><a href="/faq/">FAQs</a></li><li><a href="/contact/">Contact us</a></li></ul>
+      </div>
+      <div class="footer__col">
+        <h2>Company</h2>
+        <ul><li><a href="/about/">Our story</a></li><li><a href="/bulk-orders/">Bulk orders</a></li><li><a href="/privacy/">Privacy policy</a></li><li><a href="/terms/">Terms of service</a></li></ul>
+      </div>
+    </div>
+    <div class="footer__seo">
+      <h2>Personalised gifts, made in India</h2>
+      <p>KissaPrints turns your photos into personalised gifts: polaroid-style Memoroids, photo booth strips, song plaques with scannable codes, custom star maps, personalised magazines and newspapers, 2027 photo calendars, acrylic fridge magnets, engraved photo keychains, wooden photo frames and ready-to-gift hampers. Every order is printed on premium paper, packed gift-ready and delivered across India - Delhi, Mumbai, Bengaluru, Pune, Hyderabad, Chennai, Jaipur, Kolkata and beyond.</p>
+      <ul class="chips">{% for label, url in popular %}<li><a class="chip-link" href="{{ url }}">{{ label }}</a></li>{% endfor %}</ul>
+    </div>
+    <div class="footer__bottom">
+      <p>© {{ year }} KissaPrints. Made with love in India.</p>
+      <ul class="pay" aria-label="Payment methods we accept"><li>UPI</li><li>VISA</li><li>Mastercard</li><li>RuPay</li><li>Net banking</li></ul>
+    </div>
+  </div>
+  <p class="footer__giant" aria-hidden="true"></p>
+</footer>

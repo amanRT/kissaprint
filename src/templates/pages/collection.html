@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% import "macros.html" as m %}
+{% block content %}
+<div class="wrap">
+  <header class="plp-hero">
+    <div>
+      {{ m.breadcrumbs(crumbs) }}
+      <h1 data-plp-title>{{ heading }}</h1>
+      <p class="lead">{{ intro }}</p>
+    </div>
+    <div class="plp-hero__stats">
+      <span class="stat-pill">{{ m.icon("truck") }}Free shipping over {{ m.inr(site.free_shipping_over) }}</span>
+      <span class="stat-pill">{{ m.icon("clock") }}Dispatch in {{ site.dispatch }}</span>
+      <span class="stat-pill">{{ m.icon("gift") }}Gift-ready packing</span>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <nav aria-label="Browse by category" class="chips">
+      {%- for label, url in chips %}
+      <a class="chip-link" href="{{ url }}"{% if url == page.path %} aria-current="page"{% endif %}>{{ label }}</a>
+      {%- endfor %}
+    </nav>
+    <div class="sort"><label for="sort-by">Sort</label>
+      <select class="select" id="sort-by" data-sort="plp-grid" aria-label="Sort products">
+        <option value="featured">Featured</option>
+        <option value="price-asc">Price: low to high</option>
+        <option value="price-desc">Price: high to low</option>
+        <option value="rating">Top rated</option>
+      </select>
+    </div>
+  </div>
+  <p class="count" data-count aria-live="polite">{{ items | length }} {{ "product" if items | length == 1 else "products" }}</p>
+
+  <h2 class="sr-only">{{ heading }} - products</h2>
+  <div class="grid-products" id="plp-grid" style="margin-top: 18px">
+    {%- for p in items %}
+    {{ m.product_card(p, priority=loop.first) }}
+    {%- endfor %}
+  </div>
+  <p class="empty-state" data-empty hidden>No gifts match that search yet. <a href="/shop/">See everything</a> or <a href="/contact/">ask us for something custom</a>.</p>
+
+  <section class="seo-block" aria-labelledby="about-collection">
+    <h2 id="about-collection">{{ seo_title }}</h2>
+    <div>
+      {%- for para in seo_paras %}
+      <p>{{ para }}</p>
+      {%- endfor %}
+    </div>
+  </section>
+
+  {%- if related %}
+  <section class="section" aria-labelledby="related-title" style="padding-bottom: 0">
+    <div class="section-head"><div class="section-head__text"><h2 class="h2" id="related-title">Keep <span class="serif accent">exploring</span></h2></div></div>
+    <ul class="cats">
+      {%- for c in related %}
+      <li><a class="cat" href="{{ c.url }}"><span class="cat__img">{{ m.picture(c.image, "", sizes="(min-width: 1360px) 200px, (min-width: 900px) 14vw, 128px", widths=[360, 640]) }}</span><span class="cat__name">{{ c.name }}</span><span class="cat__sub">{{ c.sub }}</span></a></li>
+      {%- endfor %}
+    </ul>
+  </section>
+  {%- endif %}
+</div>
+{% endblock %}

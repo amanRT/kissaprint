@@ -1,0 +1,30 @@
+{% import "macros.html" as m %}
+<div class="page-layout">
+  <form class="form" action="/thank-you/" method="get" data-demo-form="Thanks! We've got your message and will reply within a few hours.">
+    <div class="form-row">
+      <label>Your name<input class="input" name="name" autocomplete="name" required></label>
+      <label>Email<input class="input" type="email" name="email" autocomplete="email" required></label>
+    </div>
+    <div class="form-row">
+      <label>Phone (optional)<input class="input" type="tel" name="phone" autocomplete="tel" inputmode="tel"></label>
+      <label>Order number (optional)<input class="input" name="order" placeholder="KP-12345"></label>
+    </div>
+    <label>What's it about?
+      <select class="input select" name="topic">
+        <option>A question before ordering</option>
+        <option>My order</option>
+        <option>Bulk or corporate order</option>
+        <option>Something else</option>
+      </select>
+    </label>
+    <label>Message<textarea class="input" name="message" rows="5" required></textarea></label>
+    <div><button class="btn btn--kiss" type="submit">Send message {{ m.icon("arrow-right", "icon--arrow") }}</button></div>
+  </form>
+  <aside class="aside-card">
+    <h2>Other ways to reach us</h2>
+    <p>{{ m.icon("mail") }} <a href="mailto:{{ site.email }}">{{ site.email }}</a></p>
+    <p>{{ m.icon("clock") }} {{ site.hours }}</p>
+    <p>{{ m.icon("instagram") }} <a href="{{ site.social.instagram }}" target="_blank" rel="noopener">@kissaprints on Instagram</a></p>
+    <p class="note">Add your WhatsApp business number and registered business address here before launch.</p>
+  </aside>
+</div>

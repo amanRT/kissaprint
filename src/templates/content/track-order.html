@@ -1,0 +1,13 @@
+{% import "macros.html" as m %}
+<div class="page-layout">
+  <form class="form" action="/thank-you/" method="get" data-demo-form="Order tracking goes live with checkout - for now, message us with your order number and we'll update you right away.">
+    <label>Order number<input class="input" name="order" placeholder="KP-12345" required></label>
+    <label>Email or phone used at checkout<input class="input" name="contact" autocomplete="email" required></label>
+    <div><button class="btn btn--kiss" type="submit">Track order {{ m.icon("arrow-right", "icon--arrow") }}</button></div>
+  </form>
+  <aside class="aside-card">
+    <h2>Good to know</h2>
+    <p>Orders are printed and dispatched within {{ site.dispatch }}. You'll get a tracking link by SMS and email as soon as yours ships.</p>
+    <a class="btn btn--ghost" href="/shipping/">Shipping &amp; delivery</a>
+  </aside>
+</div>

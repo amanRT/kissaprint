@@ -1,0 +1,470 @@
+{
+ "about-friends": {
+  "src": "/assets/img/photos/about-friends",
+  "widths": [
+   640,
+   1200
+  ],
+  "width": 1200,
+  "height": 675,
+  "group": "photos"
+ },
+ "acrylic-fridge-magnets": {
+  "src": "/assets/img/products/acrylic-fridge-magnets",
+  "widths": [
+   120,
+   360,
+   640,
+   800,
+   1200
+  ],
+  "width": 1200,
+  "height": 1200,
+  "group": "products"
+ },
+ "affection-gift-hamper": {
+  "src": "/assets/img/products/affection-gift-hamper",
+  "widths": [
+   120,
+   360,
+   640,
+   800,
+   1200
+  ],
+  "width": 1200,
+  "height": 1200,
+  "group": "products"
+ },
+ "av-1": {
+  "src": "/assets/img/photos/av-1",
+  "widths": [
+   96
+  ],
+  "width": 96,
+  "height": 96,
+  "group": "photos"
+ },
+ "av-2": {
+  "src": "/assets/img/photos/av-2",
+  "widths": [
+   96
+  ],
+  "width": 96,
+  "height": 96,
+  "group": "photos"
+ },
+ "av-3": {
+  "src": "/assets/img/photos/av-3",
+  "widths": [
+   96
+  ],
+  "width": 96,
+  "height": 96,
+  "group": "photos"
+ },
+ "av-4": {
+  "src": "/assets/img/photos/av-4",
+  "widths": [
+   96
+  ],
+  "width": 96,
+  "height": 96,
+  "group": "photos"
+ },
+ "boarding-pass-card": {
+  "src": "/assets/img/products/boarding-pass-card",
+  "widths": [
+   120,
+   360,
+   640,
+   800,
+   1200
+  ],
+  "width": 1200,
+  "height": 1200,
+  "group": "products"
+ },
+ "classic-memoroids": {
+  "src": "/assets/img/products/classic-memoroids",
+  "widths": [
+   120,
+   360,
+   640,
+   800,
+   1200
+  ],
+  "width": 1200,
+  "height": 1200,
+  "group": "products"
+ },
+ "custom-newspaper": {
+  "src": "/assets/img/products/custom-newspaper",
+  "widths": [
+   120,
+   360,
+   640,
+   800,
+   1200
+  ],
+  "width": 1200,
+  "height": 1200,
+  "group": "products"
+ },
+ "festive-diyas": {
+  "src": "/assets/img/photos/festive-diyas",
+  "widths": [
+   640,
+   1200
+  ],
+  "width": 1200,
+  "height": 675,
+  "group": "photos"
+ },
+ "gift-box": {
+  "src": "/assets/img/photos/gift-box",
+  "widths": [
+   360,
+   640
+  ],
+  "width": 640,
+  "height": 800,
+  "group": "photos"
+ },
+ "gift-hands": {
+  "src": "/assets/img/photos/gift-hands",
+  "widths": [
+   360,
+   640
+  ],
+  "width": 640,
+  "height": 640,
+  "group": "photos"
+ },
+ "gift-window": {
+  "src": "/assets/img/photos/gift-window",
+  "widths": [
+   360,
+   640
+  ],
+  "width": 640,
+  "height": 800,
+  "group": "photos"
+ },
+ "insta-memoroids": {
+  "src": "/assets/img/products/insta-memoroids",
+  "widths": [
+   120,
+   360,
+   640,
+   800,
+   1200
+  ],
+  "width": 1200,
+  "height": 1200,
+  "group": "products"
+ },
+ "memories-calendar-2027": {
+  "src": "/assets/img/products/memories-calendar-2027",
+  "widths": [
+   120,
+   360,
+   640,
+   800,
+   1200
+  ],
+  "width": 1200,
+  "height": 1200,
+  "group": "products"
+ },
+ "occ-couples": {
+  "src": "/assets/img/photos/occ-couples",
+  "widths": [
+   640,
+   1200
+  ],
+  "width": 1200,
+  "height": 900,
+  "group": "photos"
+ },
+ "occ-decor": {
+  "src": "/assets/img/photos/occ-decor",
+  "widths": [
+   360,
+   640
+  ],
+  "width": 640,
+  "height": 640,
+  "group": "photos"
+ },
+ "occ-friends": {
+  "src": "/assets/img/photos/occ-friends",
+  "widths": [
+   360,
+   640
+  ],
+  "width": 640,
+  "height": 640,
+  "group": "photos"
+ },
+ "occ-her": {
+  "src": "/assets/img/photos/occ-her",
+  "widths": [
+   360,
+   640
+  ],
+  "width": 640,
+  "height": 640,
+  "group": "photos"
+ },
+ "occ-him": {
+  "src": "/assets/img/photos/occ-him",
+  "widths": [
+   360,
+   640
+  ],
+  "width": 640,
+  "height": 640,
+  "group": "photos"
+ },
+ "occ-parents": {
+  "src": "/assets/img/photos/occ-parents",
+  "widths": [
+   360,
+   640
+  ],
+  "width": 640,
+  "height": 640,
+  "group": "photos"
+ },
+ "personalised-magazine": {
+  "src": "/assets/img/products/personalised-magazine",
+  "widths": [
+   120,
+   360,
+   640,
+   800,
+   1200
+  ],
+  "width": 1200,
+  "height": 1200,
+  "group": "products"
+ },
+ "photo-booth-strips": {
+  "src": "/assets/img/products/photo-booth-strips",
+  "widths": [
+   120,
+   360,
+   640,
+   800,
+   1200
+  ],
+  "width": 1200,
+  "height": 1200,
+  "group": "products"
+ },
+ "photo-metal-keychain": {
+  "src": "/assets/img/products/photo-metal-keychain",
+  "widths": [
+   120,
+   360,
+   640,
+   800,
+   1200
+  ],
+  "width": 1200,
+  "height": 1200,
+  "group": "products"
+ },
+ "pola-couple": {
+  "src": "/assets/img/photos/pola-couple",
+  "widths": [
+   280,
+   560
+  ],
+  "width": 560,
+  "height": 560,
+  "group": "photos"
+ },
+ "pola-family": {
+  "src": "/assets/img/photos/pola-family",
+  "widths": [
+   280,
+   560
+  ],
+  "width": 560,
+  "height": 560,
+  "group": "photos"
+ },
+ "pola-friends": {
+  "src": "/assets/img/photos/pola-friends",
+  "widths": [
+   280,
+   560
+  ],
+  "width": 560,
+  "height": 560,
+  "group": "photos"
+ },
+ "pola-holi": {
+  "src": "/assets/img/photos/pola-holi",
+  "widths": [
+   280,
+   560
+  ],
+  "width": 560,
+  "height": 560,
+  "group": "photos"
+ },
+ "pola-pet": {
+  "src": "/assets/img/photos/pola-pet",
+  "widths": [
+   280,
+   560
+  ],
+  "width": 560,
+  "height": 560,
+  "group": "photos"
+ },
+ "pola-sunset": {
+  "src": "/assets/img/photos/pola-sunset",
+  "widths": [
+   280,
+   560
+  ],
+  "width": 560,
+  "height": 560,
+  "group": "photos"
+ },
+ "song-plaque": {
+  "src": "/assets/img/products/song-plaque",
+  "widths": [
+   120,
+   360,
+   640,
+   800,
+   1200
+  ],
+  "width": 1200,
+  "height": 1200,
+  "group": "products"
+ },
+ "star-map": {
+  "src": "/assets/img/products/star-map",
+  "widths": [
+   120,
+   360,
+   640,
+   800,
+   1200
+  ],
+  "width": 1200,
+  "height": 1200,
+  "group": "products"
+ },
+ "ugc-bedroom": {
+  "src": "/assets/img/photos/ugc-bedroom",
+  "widths": [
+   300,
+   560
+  ],
+  "width": 560,
+  "height": 560,
+  "group": "photos"
+ },
+ "ugc-frames": {
+  "src": "/assets/img/photos/ugc-frames",
+  "widths": [
+   300,
+   560
+  ],
+  "width": 560,
+  "height": 560,
+  "group": "photos"
+ },
+ "ugc-hand": {
+  "src": "/assets/img/photos/ugc-hand",
+  "widths": [
+   300,
+   560
+  ],
+  "width": 560,
+  "height": 560,
+  "group": "photos"
+ },
+ "ugc-hanging": {
+  "src": "/assets/img/photos/ugc-hanging",
+  "widths": [
+   300,
+   560
+  ],
+  "width": 560,
+  "height": 560,
+  "group": "photos"
+ },
+ "ugc-instax": {
+  "src": "/assets/img/photos/ugc-instax",
+  "widths": [
+   300,
+   560
+  ],
+  "width": 560,
+  "height": 560,
+  "group": "photos"
+ },
+ "ugc-table": {
+  "src": "/assets/img/photos/ugc-table",
+  "widths": [
+   300,
+   560
+  ],
+  "width": 560,
+  "height": 560,
+  "group": "photos"
+ },
+ "ugc-wall": {
+  "src": "/assets/img/photos/ugc-wall",
+  "widths": [
+   300,
+   560
+  ],
+  "width": 560,
+  "height": 560,
+  "group": "photos"
+ },
+ "ugc-yellow": {
+  "src": "/assets/img/photos/ugc-yellow",
+  "widths": [
+   300,
+   560
+  ],
+  "width": 560,
+  "height": 560,
+  "group": "photos"
+ },
+ "vintage-memoroids": {
+  "src": "/assets/img/products/vintage-memoroids",
+  "widths": [
+   120,
+   360,
+   640,
+   800,
+   1200
+  ],
+  "width": 1200,
+  "height": 1200,
+  "group": "products"
+ },
+ "wooden-photo-frame": {
+  "src": "/assets/img/products/wooden-photo-frame",
+  "widths": [
+   120,
+   360,
+   640,
+   800,
+   1200
+  ],
+  "width": 1200,
+  "height": 1200,
+  "group": "products"
+ }
+}

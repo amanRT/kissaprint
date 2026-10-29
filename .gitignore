@@ -1,0 +1,23 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Node (only used for Lighthouse audits)
+node_modules/
+
+# Build output - regenerate with `python tools/build.py`
+dist/
+
+# QA artefacts (screenshots, Lighthouse reports)
+qa/
+
+# Design pipeline intermediates (re-creatable with the tools/ scripts)
+design/renders/
+design/source-photos/*.jpg
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

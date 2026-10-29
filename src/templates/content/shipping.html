@@ -1,0 +1,18 @@
+{% import "macros.html" as m %}
+<div class="page-layout">
+  <div class="prose">
+    <p class="note">Draft policy - confirm dispatch times, courier partners and charges before launch.</p>
+    <h2>Dispatch</h2>
+    <p>Every order is checked by our team, printed and dispatched within <strong>{{ site.dispatch }}</strong> (Monday to Saturday). Designed products such as magazines, newspapers and calendars are dispatched within 48 hours of you approving the digital preview.</p>
+    <h2>Delivery time</h2>
+    <p>Most orders reach metro cities in 3-5 working days and the rest of India in {{ site.delivery }}. You'll receive a tracking link by SMS and email as soon as your parcel ships.</p>
+    <h2>Shipping charges</h2>
+    <ul>
+      <li>Free shipping on orders above {{ m.inr(site.free_shipping_over) }}.</li>
+      <li>A flat shipping fee applies to smaller orders and is shown at checkout.</li>
+    </ul>
+    <h2>Festive and urgent orders</h2>
+    <p>During festive weeks courier networks get busy, so please order early. Need something by a specific date? <a href="/contact/">Message us</a> before ordering and we'll tell you honestly whether we can make it.</p>
+  </div>
+  <aside class="aside-card"><h2>Where's my order?</h2><p>Use your order number to check its status.</p><a class="btn" href="/track-order/">Track your order</a></aside>
+</div>

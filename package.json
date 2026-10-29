@@ -1,0 +1,11 @@
+{
+  "name": "kissaprints",
+  "private": true,
+  "description": "KissaPrints website - Node is only used for Lighthouse audits (the site itself builds with Python).",
+  "scripts": {
+    "audit": "python tools/lighthouse.py"
+  },
+  "devDependencies": {
+    "lighthouse": "^13.6.0"
+  }
+}

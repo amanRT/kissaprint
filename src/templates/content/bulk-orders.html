@@ -1,0 +1,36 @@
+{% import "macros.html" as m %}
+<div class="values">
+  <div class="value" style="--tint: var(--blush)"><h3>From 25 units</h3><p>Weddings, birthdays, offsites, Diwali gifting and client hampers.</p></div>
+  <div class="value" style="--tint: var(--sky)"><h3>Your branding</h3><p>Custom packaging, logo printing and personalised notes for every recipient.</p></div>
+  <div class="value" style="--tint: var(--butter)"><h3>Quote in 24 hours</h3><p>Tell us what you need - we'll reply with options, pricing and timelines.</p></div>
+</div>
+<div class="page-layout" style="margin-top: clamp(32px, 5vw, 56px)">
+  <form class="form" action="/thank-you/" method="get" data-demo-form="Thanks! Our gifting team will send you a quote within one working day.">
+    <div class="form-row">
+      <label>Your name<input class="input" name="name" autocomplete="name" required></label>
+      <label>Company or event<input class="input" name="company" autocomplete="organization"></label>
+    </div>
+    <div class="form-row">
+      <label>Work email<input class="input" type="email" name="email" autocomplete="email" required></label>
+      <label>Phone<input class="input" type="tel" name="phone" autocomplete="tel" inputmode="tel" required></label>
+    </div>
+    <div class="form-row">
+      <label>Products you're interested in
+        <select class="input select" name="product">
+          {%- for c in categories %}<option>{{ c.name }}</option>{% endfor %}
+          <option>Not sure yet</option>
+        </select>
+      </label>
+      <label>Quantity<input class="input" type="number" name="qty" min="25" value="50" inputmode="numeric"></label>
+    </div>
+    <label>Needed by<input class="input" type="date" name="date"></label>
+    <label>Tell us more<textarea class="input" name="message" rows="4" placeholder="Occasion, budget per gift, branding ideas…"></textarea></label>
+    <div><button class="btn btn--kiss" type="submit">Request a quote {{ m.icon("arrow-right", "icon--arrow") }}</button></div>
+  </form>
+  <aside class="aside-card">
+    <h2>Popular for teams</h2>
+    <p>Engraved keychains, desk calendars, fridge magnets and our Affection Box hampers.</p>
+    <a class="btn btn--ghost" href="/collections/hampers/">See gift hampers</a>
+    <p>Prefer email? Write to <a href="mailto:{{ site.email }}">{{ site.email }}</a> with your requirement.</p>
+  </aside>
+</div>
