@@ -1,0 +1,8 @@
+{%- import "macros.html" as m -%}
+{#- Checkout header: just the logo and a reassurance - no menus to wander off into. -#}
+<header class="co-header">
+  <div class="wrap co-header__bar">
+    <a class="logo" href="/" aria-label="KissaPrints home"><svg class="logo__mark" aria-hidden="true"><use href="#logo-mark"/></svg><span class="logo__word" aria-hidden="true"><em>kissa</em>prints</span></a>
+    <span class="secure-badge">{{ m.icon("shield") }} Secure checkout</span>
+  </div>
+</header>

@@ -29,14 +29,14 @@
       </div>
       <p class="pdp__short">{{ p.short }}</p>
 
-      <form class="pdp__form" data-pdp data-slug="{{ p.slug }}" data-name="{{ p.name }}" data-price="{{ p.price }}" data-image="{{ asset(images[p.slug].src ~ '-360.webp') }}">
+      <form class="pdp__form" data-pdp data-slug="{{ p.slug }}" data-name="{{ p.name }}" data-price="{{ p.price }}" data-need="{{ p.photos }}" data-image="{{ asset(images[p.slug].src ~ '-360.webp') }}">
         {%- for opt in p.options %}
         {%- set oi = loop.index %}
-        <fieldset class="opt">
-          <legend>{{ opt.name }}: <output>{{ opt["values"][0].label }}</output></legend>
+        <fieldset class="opt" data-opt-name="{{ opt.name }}">
+          <legend>{{ opt.name }}: <output>{{ opt["values"][opt.default].label }}</output></legend>
           <div class="opt__values">
-            {%- for v in opt["values"] %}{% set vp = v.get("price") %}
-            <label class="choice"><input type="radio" name="opt{{ oi }}" value="{{ v.label }}"{% if vp %} data-price="{{ vp }}"{% endif %}{% if loop.first %} checked{% endif %}><span>{{ v.label }}{% if vp %}<small>{{ m.inr(vp) }}</small>{% endif %}</span></label>
+            {%- for v in opt["values"] %}{% set vp = v.get("price") %}{% set vn = v.get("photos") %}
+            <label class="choice"><input type="radio" name="opt{{ oi }}" value="{{ v.label }}"{% if vp %} data-price="{{ vp }}"{% endif %}{% if vn %} data-need="{{ vn }}"{% endif %}{% if loop.index0 == opt.default %} checked{% endif %}><span>{{ v.label }}{% if vp %}<small>{{ m.inr(vp) }}</small>{% endif %}</span></label>
             {%- endfor %}
           </div>
         </fieldset>
@@ -44,12 +44,13 @@
 
         {%- if p.photos %}
         <div>
-          <span class="field-label">Your photos <span>({{ p.photos }} needed - you can also send them later)</span></span>
+          <span class="field-label">Your photos <span>(<span data-need-out>{{ p.need }}</span> needed - add them now or send them after you order)</span></span>
           <label class="dropzone" data-dropzone>
-            {{ m.icon("upload") }}<strong>Tap to add photos</strong><span>JPG, PNG or HEIC · or WhatsApp them after you order</span>
-            <input type="file" accept="image/*" multiple aria-label="Add your photos" data-photos>
+            {{ m.icon("upload") }}<strong>Tap to add photos</strong><span>JPG, PNG or HEIC, up to 25 MB each</span>
+            <input type="file" accept="image/*" multiple aria-label="Add your photos" data-photo-input>
           </label>
           <div class="previews" data-previews></div>
+          <p class="photo-status" data-photo-status aria-live="polite"></p>
         </div>
         {%- endif %}
 
@@ -99,7 +100,7 @@
     <div class="section-head"><div class="section-head__text"><span class="eyebrow">How it works</span><h2 class="h2" id="how-title">Your {{ p.name }}, <span class="serif accent">made in three steps</span></h2></div></div>
     <ol class="steps">
       <li class="step" style="--tint: var(--blush)"><div class="step__top"><span class="step__icon">{{ m.icon("image") }}</span><span class="step__num" data-num="01" aria-hidden="true"></span></div><h3>Choose &amp; personalise</h3><p>Pick your options and add a caption or message.</p></li>
-      <li class="step" style="--tint: var(--sky)"><div class="step__top"><span class="step__icon">{{ m.icon("upload") }}</span><span class="step__num" data-num="02" aria-hidden="true"></span></div><h3>Send your photos</h3><p>Upload them here, or WhatsApp them to us after checkout.</p></li>
+      <li class="step" style="--tint: var(--sky)"><div class="step__top"><span class="step__icon">{{ m.icon("upload") }}</span><span class="step__num" data-num="02" aria-hidden="true"></span></div><h3>Send your photos</h3><p>Upload them here, or {{ "WhatsApp" if site.whatsapp else "email" }} them to us after checkout.</p></li>
       <li class="step" style="--tint: var(--butter)"><div class="step__top"><span class="step__icon">{{ m.icon("package") }}</span><span class="step__num" data-num="03" aria-hidden="true"></span></div><h3>We print &amp; ship</h3><p>Checked by a human, printed with care, shipped in {{ site.dispatch }}.</p></li>
     </ol>
   </div>

@@ -19,9 +19,12 @@
 <link rel="preload" href="{{ asset('/assets/fonts/instrument-serif-italic.woff2') }}" as="font" type="font/woff2" crossorigin>
 {%- block preload %}{% endblock %}
 {%- if inline_css %}
-<style>{{ inline_css | safe }}</style>
+<style>{{ inline_css | safe }}{% for name in page.css %}{{ page_css[name] | safe }}{% endfor %}</style>
 {%- else %}
 <link rel="stylesheet" href="{{ asset('/assets/css/main.css') }}">
+{%- for name in page.css %}
+<link rel="stylesheet" href="{{ asset('/assets/css/' ~ name ~ '.css') }}">
+{%- endfor %}
 {%- endif %}
 <meta property="og:type" content="{{ page.og_type or 'website' }}">
 <meta property="og:site_name" content="{{ site.name }}">
@@ -39,12 +42,23 @@
 <body{% if page.body_class %} class="{{ page.body_class }}"{% endif %}>
 <a class="skip-link" href="#main">Skip to content</a>
 {% include "partials/icons.html" %}
+{%- if page.minimal %}
+{% include "partials/header-minimal.html" %}
+{%- else %}
 {% include "partials/header.html" %}
+{%- endif %}
 <main id="main">
 {% block content %}{% endblock %}
 </main>
+{%- if page.minimal %}
+{% include "partials/footer-minimal.html" %}
+{%- else %}
 {% include "partials/footer.html" %}
 {% include "partials/dialogs.html" %}
 <script src="{{ asset('/assets/js/main.js') }}" defer></script>
+{%- endif %}
+{%- for s in page.scripts %}
+<script src="{{ asset(s) }}" defer></script>
+{%- endfor %}
 </body>
 </html>
