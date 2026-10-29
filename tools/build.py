@@ -22,6 +22,10 @@ from markupsafe import Markup, escape
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "src"
 DIST = ROOT / "dist"
+sys.path.insert(0, str(ROOT))
+from backend.catalog import default_index  # noqa: E402 - same pre-selection rule as the server's pricing
+
+SCRIPTS = ["main", "checkout", "order", "admin"]  # src/js/<name>.js -> /assets/js/<name>.<hash>.js
 
 NAV_GROUPS = [
     ("Prints & keepsakes", ["memoroids", "photo-strips", "boarding-passes", "newspapers"]),
@@ -120,6 +124,10 @@ def load_data():
         if p["price"] < 400:
             tags.add("under-400")
         p["filter_tags"] = " ".join(sorted(tags))
+        p["need"] = p.get("photos", 0)  # photos needed for the pre-selected options
+        for opt in p["options"]:
+            opt["default"] = default_index(p, opt)
+            p["need"] = opt["values"][opt["default"]].get("photos", p["need"])
         missing = [g for g in [p["slug"], *p["gallery"]] if g not in images]
         if missing:
             sys.exit(f"Missing images for {p['slug']}: {missing} - run tools/render_mockups.py / build_images.py")
@@ -204,7 +212,12 @@ def build(inline_css=False):
     css = re.sub(r'url\("(/assets/[^"]+)"\)', lambda mt: f'url("{asset(mt.group(1))}")', css)
     css = minify_css(css)
     asset.add("/assets/css/main.css", css.encode())
-    asset.add("/assets/js/main.js", minify_js((SRC / "js" / "main.js").read_text(encoding="utf-8")).encode())
+    # Page-specific stylesheets: inlined (or linked) only where a page lists them in page["css"].
+    page_css = {name: minify_css((SRC / "css" / f"{name}.css").read_text(encoding="utf-8")) for name in ("checkout", "admin")}
+    for name, text in page_css.items():
+        asset.add(f"/assets/css/{name}.css", text.encode())
+    for name in SCRIPTS:
+        asset.add(f"/assets/js/{name}.js", minify_js((SRC / "js" / f"{name}.js").read_text(encoding="utf-8")).encode())
 
     products = catalog["products"]
     search = [{"name": p["name"], "url": p["url"], "meta": p["meta"], "price": p["price"],
@@ -223,14 +236,16 @@ def build(inline_css=False):
         products=products, products_by_slug={p["slug"]: p for p in products},
         products_by_reviews=sorted(products, key=lambda p: -p["reviews"]),
         reviews=catalog["reviews"], faqs=catalog["faqs"],
+        states=json.loads((SRC / "data" / "states.json").read_text(encoding="utf-8")),
         nav_groups=[{"title": t, "links": [cats_by_slug[s] for s in slugs]} for t, slugs in NAV_GROUPS],
-        inline_css=css if inline_css else "",
+        inline_css=css if inline_css else "", page_css=page_css if inline_css else {},
     )
     pages = []
 
     def render(template, path, page, **ctx):
         for key, default in (("jsonld", []), ("noindex", False), ("body_class", ""), ("og_type", "website"),
-                             ("og_title", ""), ("og_image", ""), ("og_image_alt", "")):
+                             ("og_title", ""), ("og_image", ""), ("og_image_alt", ""), ("minimal", False), ("scripts", []),
+                             ("css", [])):
             page.setdefault(key, default)
         page["path"] = path
         html = minify_html(env.get_template(template).render(page=page, **ctx))
@@ -306,15 +321,28 @@ def build(inline_css=False):
         if slug == "faq":
             jsonld.append(ld_faq(catalog["faqs"]))
         render("pages/info.html", f"/{slug}/", {"title": title, "description": desc, "jsonld": jsonld,
-                                                 "noindex": slug == "thank-you"}, slug=slug, heading=heading, crumb=crumb, intro=intro)
+                                                 "noindex": slug == "thank-you",
+                                                 "scripts": ["/assets/js/order.js"] if slug == "track-order" else [],
+                                                 "css": ["checkout"] if slug == "track-order" else []},
+               slug=slug, heading=heading, crumb=crumb, intro=intro)
     render("pages/404.html", "/404.html", {"title": "Page not found | KissaPrints",
                                             "description": "This page couldn't be found.", "noindex": True})
+
+    # Ordering: checkout (no distractions), the customer's order page, and the team's dashboard.
+    render("pages/checkout.html", "/checkout/", {"title": "Checkout | KissaPrints", "noindex": True, "minimal": True,
+                                                 "description": "Secure checkout for your KissaPrints order.",
+                                                 "scripts": ["/assets/js/checkout.js"], "css": ["checkout"]})
+    render("pages/order.html", "/order/", {"title": "Your order | KissaPrints", "noindex": True, "css": ["checkout"],
+                                           "description": "Your KissaPrints order status.", "scripts": ["/assets/js/order.js"]})
+    render("pages/admin.html", "/admin/", {"title": "Orders | KissaPrints admin", "noindex": True, "description": ""})
 
     # SEO plumbing
     today = dt.date.today().isoformat()
     urls = "".join(f"<url><loc>{site['url']}{p}</loc><lastmod>{today}</lastmod></url>" for p in pages)
     (DIST / "sitemap.xml").write_text(f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>\n', encoding="utf-8")
-    (DIST / "robots.txt").write_text(f"User-agent: *\nAllow: /\nDisallow: /thank-you/\n\nSitemap: {site['url']}/sitemap.xml\n", encoding="utf-8")
+    # /admin/ is deliberately not listed (robots.txt is public); it carries noindex instead.
+    (DIST / "robots.txt").write_text("User-agent: *\nAllow: /\n" + "".join(f"Disallow: {p}\n" for p in ("/thank-you/", "/checkout/", "/order/", "/api/"))
+                                     + f"\nSitemap: {site['url']}/sitemap.xml\n", encoding="utf-8")
     (DIST / "_headers").write_text(
         "/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n"
         "/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n"

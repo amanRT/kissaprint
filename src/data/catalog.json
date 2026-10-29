@@ -10,6 +10,7 @@
     "whatsapp": "",
     "hours": "Mon-Sat, 10am-7pm IST",
     "free_shipping_over": 699,
+    "shipping_fee": 79,
     "dispatch": "48 hours",
     "delivery": "5-7 working days",
     "social": {
@@ -84,7 +85,7 @@
       "short": "Polaroid-style prints with a crisp white border and space for a handwritten caption.",
       "description": "Our signature print. Each Memoroid is printed on thick 300 GSM card with a soft matte finish, then trimmed into the classic instant-camera shape - with a wide bottom border for your caption. Stick them on a wall, string them up with fairy lights or slip them into a gift.",
       "options": [
-        { "name": "Pack size", "values": [{ "label": "10 prints", "price": 249 }, { "label": "20 prints", "price": 449 }, { "label": "30 prints", "price": 599 }] },
+        { "name": "Pack size", "values": [{ "label": "10 prints", "price": 249, "photos": 10 }, { "label": "20 prints", "price": 449, "photos": 20 }, { "label": "30 prints", "price": 599, "photos": 30 }] },
         { "name": "Finish", "values": [{ "label": "Matte" }, { "label": "Glossy" }] }
       ],
       "specs": [["Print size", "3.5 × 4.2 in (photo 3.1 × 3.1 in)"], ["Paper", "300 GSM premium card"], ["Finish", "Matte or glossy"], ["Caption", "Printed for you, or left blank to write on"]],
@@ -96,7 +97,7 @@
       "short": "Warm, faded film tones on a cream border, finished with a retro date stamp.",
       "description": "For memories that deserve a little nostalgia. We apply a hand-tuned film tone to every photo, print it on cream-toned 300 GSM card and add an optional orange date stamp, just like the instant cameras of the 90s.",
       "options": [
-        { "name": "Pack size", "values": [{ "label": "10 prints", "price": 279 }, { "label": "20 prints", "price": 499 }, { "label": "30 prints", "price": 649 }] },
+        { "name": "Pack size", "values": [{ "label": "10 prints", "price": 279, "photos": 10 }, { "label": "20 prints", "price": 499, "photos": 20 }, { "label": "30 prints", "price": 649, "photos": 30 }] },
         { "name": "Date stamp", "values": [{ "label": "Add date stamp" }, { "label": "No stamp" }] }
       ],
       "specs": [["Print size", "3.5 × 4.2 in"], ["Paper", "300 GSM cream card"], ["Tone", "Hand-tuned vintage film"], ["Date stamp", "Optional, your dates"]],
@@ -108,7 +109,7 @@
       "short": "Your favourite posts as prints - username, likes and caption included.",
       "description": "Turn the feed into something you can hold. Send us your photos with the username, location and caption you want, and we'll print each one as a crisp Instagram-style post on thick card.",
       "options": [
-        { "name": "Pack size", "values": [{ "label": "8 prints", "price": 299 }, { "label": "16 prints", "price": 549 }] }
+        { "name": "Pack size", "values": [{ "label": "8 prints", "price": 299, "photos": 8 }, { "label": "16 prints", "price": 549, "photos": 16 }] }
       ],
       "specs": [["Print size", "3.5 × 5 in"], ["Paper", "300 GSM card"], ["Details", "Username, location, likes & caption"], ["Finish", "Matte"]],
       "gallery": ["insta-memoroids", "ugc-hand"] },
@@ -120,7 +121,7 @@
       "description": "The photo booth moment, minus the queue. Each strip holds four of your photos with a custom footer line - your names, a date or an inside joke. Choose colour on white, or black and white on a black strip.",
       "options": [
         { "name": "Style", "values": [{ "label": "Colour on white" }, { "label": "B&W on black" }] },
-        { "name": "Pack size", "values": [{ "label": "4 strips", "price": 199 }, { "label": "8 strips", "price": 349 }] }
+        { "name": "Pack size", "values": [{ "label": "4 strips", "price": 199, "photos": 16 }, { "label": "8 strips", "price": 349, "photos": 32 }] }
       ],
       "specs": [["Strip size", "2 × 6 in"], ["Frames", "4 photos per strip"], ["Paper", "300 GSM card"], ["Footer", "Custom text"]],
       "gallery": ["photo-booth-strips", "ugc-frames"] },
@@ -187,7 +188,7 @@
       "description": "Each magnet is printed behind 3 mm of glossy acrylic with softly rounded edges and a strong magnet on the back. Mix squares and hearts to build your own little gallery.",
       "options": [
         { "name": "Shape", "values": [{ "label": "Square" }, { "label": "Heart" }, { "label": "Mixed" }] },
-        { "name": "Pack size", "values": [{ "label": "4 magnets", "price": 389 }, { "label": "8 magnets", "price": 699 }] }
+        { "name": "Pack size", "values": [{ "label": "4 magnets", "price": 389, "photos": 4 }, { "label": "8 magnets", "price": 699, "photos": 8 }] }
       ],
       "specs": [["Size", "2.5 × 2.5 in"], ["Material", "3 mm glossy acrylic"], ["Back", "Strong ceramic magnet"], ["Shapes", "Square or heart"]],
       "gallery": ["acrylic-fridge-magnets"] },
@@ -198,7 +199,7 @@
       "short": "Carry them everywhere - your photo on the front, your words engraved on the back.",
       "description": "A rust-proof stainless steel keychain with your photo sealed under a protective gloss on the front and your words laser-engraved on the back. The one gift that goes everywhere with them.",
       "options": [
-        { "name": "Back side", "values": [{ "label": "Engraved text", "price": 349 }, { "label": "Second photo", "price": 379 }] }
+        { "name": "Back side", "values": [{ "label": "Engraved text", "price": 349, "photos": 1 }, { "label": "Second photo", "price": 379, "photos": 2 }] }
       ],
       "specs": [["Size", "1.6 × 2.4 in"], ["Material", "Stainless steel"], ["Front", "Photo with gloss coat"], ["Back", "Laser engraving or photo"]],
       "gallery": ["photo-metal-keychain"] },

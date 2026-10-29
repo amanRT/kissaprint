@@ -11,6 +11,12 @@
   };
   const root = document.documentElement;
   const FREE_SHIP = Number(root.dataset.freeShip) || 699;
+  const api = async (route, body) => {
+    const res = await fetch(`/api/${route}/`, body ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) } : {});
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw Object.assign(new Error(data.error || "Something went wrong - please try again"), { status: res.status });
+    return data;
+  };
 
   /* ---------- Header: elevate once the offer bar scrolls away ----------
      IntersectionObserver instead of reading scrollY: no forced layout at startup. */
@@ -56,14 +62,19 @@
   let toastTimer;
   const showToast = (message) => {
     if (!toast) return;
+    // An open modal dialog sits in the top layer, so the toast has to live inside it to be seen.
+    ($("dialog[open]") || document.body).append(toast);
     $("[data-toast-msg]", toast).textContent = message;
     toast.classList.add("is-visible");
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => toast.classList.remove("is-visible"), 2800);
   };
 
-  /* ---------- Cart (localStorage) ---------- */
-  let cart = store.get("kp-cart", []);
+  /* ---------- Cart (localStorage; checkout.js reads the same key) ----------
+     Item: {id, slug, name, image, price, qty, options (label), opts {option: value}, note, photos [{key, name, size}], need}.
+     The server re-prices everything at checkout, so `price` here is display-only. */
+  localStorage.removeItem("kp-cart"); // pre-checkout format had no structured options
+  let cart = store.get("kp-cart2", []);
   const cartTotal = () => cart.reduce((sum, item) => sum + item.price * item.qty, 0);
   const updateCount = (bump) => {
     const count = cart.reduce((sum, item) => sum + item.qty, 0);
@@ -73,7 +84,12 @@
       if (bump) { el.classList.remove("is-bump"); void el.offsetWidth; el.classList.add("is-bump"); }
     });
   };
-  const saveCart = (bump) => { store.set("kp-cart", cart); updateCount(bump); };
+  const saveCart = (bump) => { store.set("kp-cart2", cart); updateCount(bump); };
+  const photoNote = (item) => {
+    const got = (item.photos || []).length;
+    if (item.need) return got >= item.need ? `All ${item.need} photos added` : `${got} of ${item.need} photos added - send the rest after ordering`;
+    return got ? `${got} photo${got === 1 ? "" : "s"} added` : "";
+  };
   function renderCart() {
     const body = $("[data-cart-body]");
     const foot = $("[data-cart-foot]");
@@ -86,7 +102,7 @@
       `<div class="ship-meter__bar"><span style="--p:${Math.min(100, (total / FREE_SHIP) * 100)}%"></span></div></div>` +
       cart.map((item, i) => `<div class="cart-item">
         <img src="${esc(item.image)}" alt="" width="76" height="76">
-        <div><h3>${esc(item.name)}</h3><p>${esc(item.options)}</p>
+        <div><h3>${esc(item.name)}</h3><p>${esc(item.options)}</p>${photoNote(item) ? `<p class="cart-item__photos">${esc(photoNote(item))}</p>` : ""}
           <div class="cart-item__row">
             <div class="qty"><button type="button" aria-label="Decrease quantity" data-cart-step="-1" data-i="${i}">−</button><input value="${item.qty}" aria-label="Quantity" readonly><button type="button" aria-label="Increase quantity" data-cart-step="1" data-i="${i}">+</button></div>
             <button class="link-btn" type="button" data-cart-remove data-i="${i}">Remove</button>
@@ -104,11 +120,11 @@
     saveCart();
     renderCart();
   });
-  $("[data-checkout]")?.addEventListener("click", () => showToast("Checkout connects to the payment gateway at launch"));
   const addToCart = (item) => {
-    const existing = cart.find((c) => c.slug === item.slug && c.options === item.options);
+    // Lines with photos stay separate: each one is its own personalised design.
+    const existing = !item.photos.length && cart.find((c) => c.slug === item.slug && c.options === item.options && !(c.photos || []).length);
     if (existing) existing.qty = Math.min(20, existing.qty + item.qty);
-    else cart.push(item);
+    else cart.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), ...item });
     saveCart(true);
     openDialog("cart-drawer");
   };
@@ -213,9 +229,116 @@
       return price;
     };
     const qty = () => Math.min(20, Math.max(1, Number(qtyInput.value) || 1));
+    // Photos needed for the chosen options (e.g. a 30-print pack needs 30).
+    const need = () => {
+      let n = Number(pdp.dataset.need) || 0;
+      $$("input[data-need]:checked", pdp).forEach((i) => { n = Number(i.dataset.need); });
+      return n;
+    };
+
+    /* Photos upload straight to storage the moment they're picked, so checkout doesn't wait on them.
+       Each: {file, name, size, type, el, state: "up" | "done" | "err" | "off" | "gone", key, xhr} */
+    const photoInput = $("[data-photo-input]", pdp);
+    const previews = $("[data-previews]", pdp);
+    const dropzone = $("[data-dropzone]", pdp);
+    const photoStatus = $("[data-photo-status]", pdp);
+    const photos = [];
+    const MAX_PHOTOS = 100;
+    const MAX_BYTES = 25 * 1024 * 1024;
+    let uploads = Promise.resolve();
+    const paintPhotos = () => {
+      if (!photoStatus) return;
+      const n = need();
+      const count = (s) => photos.filter((p) => p.state === s).length;
+      $("[data-need-out]", pdp).textContent = n;
+      const parts = [];
+      if (photos.length) parts.push(n ? `${photos.length} of ${n} photos added` : `${photos.length} photo${photos.length === 1 ? "" : "s"} added`);
+      if (count("up")) parts.push(`uploading ${count("up")}…`);
+      if (count("err")) parts.push(`${count("err")} didn't upload - tap ↻ to retry`);
+      if (count("off")) parts.push("photo upload is paused right now, so please send them after you order");
+      photoStatus.textContent = parts.join(" · ");
+      $("strong", dropzone).textContent = photos.length ? "Add more photos" : "Tap to add photos";
+    };
+    const setState = (p, state) => { if (p.state !== "gone") { p.state = state; p.el.dataset.state = state; } paintPhotos(); };
+    const sendPhoto = (p, slot) => new Promise((resolve) => {
+      const xhr = new XMLHttpRequest();
+      p.xhr = xhr;
+      xhr.open(slot.method || "PUT", slot.url);
+      Object.entries(slot.headers || {}).forEach(([k, v]) => xhr.setRequestHeader(k, v));
+      xhr.upload.onprogress = (e) => { if (e.lengthComputable) p.el.style.setProperty("--pct", `${Math.round((e.loaded / e.total) * 100)}%`); };
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) p.key = slot.key;
+        setState(p, p.key ? "done" : "err");
+        resolve();
+      };
+      xhr.onerror = xhr.onabort = () => { setState(p, "err"); resolve(); };
+      xhr.send(p.file);
+    });
+    // Batches of up to 20 (one API call for the upload links), three files at a time on the wire.
+    const upload = (batch) => {
+      uploads = uploads.then(async () => {
+        batch = batch.filter((p) => p.state === "up");
+        if (!batch.length) return;
+        let slots;
+        try {
+          ({ uploads: slots } = await api("uploads", { slug: pdp.dataset.slug, files: batch.map((p) => ({ name: p.name, type: p.type, size: p.size })) }));
+        } catch (err) {
+          batch.forEach((p) => setState(p, err.status === 503 ? "off" : "err"));
+          return;
+        }
+        const jobs = batch.map((p, i) => [p, slots[i]]);
+        const worker = async () => { for (let job = jobs.shift(); job; job = jobs.shift()) if (job[0].state === "up") await sendPhoto(...job); };
+        await Promise.all([worker(), worker(), worker()]);
+      });
+      return uploads;
+    };
+    const addPhotos = (files) => {
+      const fit = files.filter((f) => (f.type.startsWith("image/") || /\.(heic|heif)$/i.test(f.name)) && f.size <= MAX_BYTES);
+      if (fit.length < files.length) showToast("Some files were skipped - photos only, up to 25 MB each");
+      const fresh = fit.slice(0, Math.max(0, MAX_PHOTOS - photos.length)).map((file) => {
+        const el = document.createElement("div");
+        el.className = "thumb";
+        const img = new Image();
+        img.alt = "";
+        img.onerror = () => el.classList.add("is-noprev"); // e.g. HEIC outside Safari
+        img.src = URL.createObjectURL(file);
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.className = "thumb__x";
+        remove.setAttribute("aria-label", `Remove ${file.name}`);
+        remove.textContent = "×";
+        const retry = document.createElement("button");
+        retry.type = "button";
+        retry.className = "thumb__retry";
+        retry.setAttribute("aria-label", `Retry uploading ${file.name}`);
+        retry.textContent = "↻";
+        el.append(img, remove, retry);
+        previews.append(el);
+        const p = { file, name: file.name, size: file.size, type: file.type || "", el, state: "up" };
+        el.dataset.state = "up";
+        remove.addEventListener("click", () => {
+          p.state = "gone";
+          p.xhr?.abort();
+          URL.revokeObjectURL(img.src);
+          el.remove();
+          photos.splice(photos.indexOf(p), 1);
+          paintPhotos();
+        });
+        retry.addEventListener("click", () => { setState(p, "up"); upload([p]); });
+        return p;
+      });
+      photos.push(...fresh);
+      paintPhotos();
+      for (let i = 0; i < fresh.length; i += 20) upload(fresh.slice(i, i + 20));
+    };
+    photoInput?.addEventListener("change", () => { addPhotos([...photoInput.files]); photoInput.value = ""; });
+    ["dragenter", "dragover"].forEach((t) => dropzone?.addEventListener(t, () => dropzone.classList.add("is-over")));
+    ["dragleave", "drop"].forEach((t) => dropzone?.addEventListener(t, () => dropzone.classList.remove("is-over")));
+
     const refresh = () => {
       $$("[data-price-out]").forEach((out) => { out.textContent = inr(unitPrice() * qty()); });
       $$(".opt", pdp).forEach((set) => { const checked = $("input:checked", set); if (checked) $("output", set).textContent = checked.value; });
+      paintPhotos();
     };
     pdp.addEventListener("change", refresh);
     qtyInput.addEventListener("input", refresh);
@@ -224,27 +347,32 @@
       refresh();
     }));
 
-    const photos = $("[data-photos]", pdp);
-    const previews = $("[data-previews]", pdp);
-    const dropzone = $("[data-dropzone]", pdp);
-    photos?.addEventListener("change", () => {
-      previews.replaceChildren(...[...photos.files].slice(0, 40).map((file) => {
-        const img = new Image();
-        img.alt = "";
-        img.src = URL.createObjectURL(file);
-        return img;
-      }));
-      $("strong", dropzone).textContent = `${photos.files.length} photo${photos.files.length === 1 ? "" : "s"} added`;
-    });
-    ["dragenter", "dragover"].forEach((t) => dropzone?.addEventListener(t, () => dropzone.classList.add("is-over")));
-    ["dragleave", "drop"].forEach((t) => dropzone?.addEventListener(t, () => dropzone.classList.remove("is-over")));
-
-    pdp.addEventListener("submit", (e) => {
+    const addBtn = $("[data-add]", pdp);
+    pdp.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const options = $$("input[type=radio]:checked", pdp).map((i) => i.value);
-      const note = $("#note", pdp)?.value.trim();
-      if (note) options.push(`“${note}”`);
-      addToCart({ slug: pdp.dataset.slug, name: pdp.dataset.name, image: pdp.dataset.image, price: unitPrice(), qty: qty(), options: options.join(" · ") });
+      if (addBtn.disabled) return;
+      if (photos.some((p) => p.state === "up")) {
+        const label = addBtn.innerHTML;
+        addBtn.disabled = true;
+        addBtn.textContent = "Uploading your photos…";
+        for (let i = 0; i < 100 && photos.some((p) => p.state === "up"); i++) await uploads;
+        addBtn.innerHTML = label;
+        addBtn.disabled = false;
+        refresh();
+      }
+      const opts = {};
+      $$("[data-opt-name]", pdp).forEach((set) => { const c = $("input:checked", set); if (c) opts[set.dataset.optName] = c.value; });
+      const labels = Object.values(opts);
+      const note = ($("#note", pdp)?.value || "").trim().slice(0, 60);
+      if (note) labels.push(`“${note}”`);
+      addToCart({
+        slug: pdp.dataset.slug, name: pdp.dataset.name, image: pdp.dataset.image, price: unitPrice(), qty: qty(),
+        options: labels.join(" · "), opts, note, need: need(),
+        photos: photos.filter((p) => p.state === "done").map((p) => ({ key: p.key, name: p.name, size: p.size })),
+      });
+      // Those photos now belong to that cart line - start fresh for the next one.
+      photos.splice(0).forEach((p) => { URL.revokeObjectURL($("img", p.el).src); p.el.remove(); });
+      paintPhotos();
     });
 
     const pin = $("[data-pin]");
@@ -268,7 +396,6 @@
     }));
 
     const bar = $("[data-sticky-buy]");
-    const addBtn = $("[data-add]", pdp);
     if (bar && "IntersectionObserver" in window) {
       new IntersectionObserver(([entry]) => {
         const show = !entry.isIntersecting && entry.boundingClientRect.top < 0;
