@@ -314,6 +314,37 @@ describe("Razorpay webhook", () => {
   });
 });
 
+describe("Razorpay refunds", () => {
+  useTestEnv({ RAZORPAY_KEY_ID: "rzp_test_abc", RAZORPAY_KEY_SECRET: "keysecret", RAZORPAY_WEBHOOK_SECRET: "whsec" });
+
+  it("records refunds made in the Razorpay dashboard, once each, and marks full refunds", async () => {
+    vi.spyOn(Razorpay.prototype, "createOrder").mockResolvedValue({ id: "order_RF1", amount: 62800 });
+    const placed = await call(createOrder, "POST", "/api/orders/", { cookie: await shopperCookie(), body: { items: [{ slug: "song-plaque" }], customer: CUSTOMER, address: ADDRESS } });
+    const id = placed.data.order.id;
+    const hook = (body: object) => { const raw = JSON.stringify(body); return call(webhook, "POST", "/api/razorpay-webhook/", { raw, headers: { "x-razorpay-signature": hmac("whsec", raw), "content-type": "application/json" } }); };
+    const payment = (refunded = 0) => ({ entity: { id: "pay_RF1", order_id: "order_RF1", amount: 62800, currency: "INR", method: "upi", amount_refunded: refunded } });
+    await hook({ event: "payment.captured", payload: { payment: payment() } });
+    const refund = (event: string, rid: string, amount: number, refunded: number) => hook({ event, payload: { refund: { entity: { id: rid, amount, payment_id: "pay_RF1" } }, payment: payment(refunded) } });
+
+    await refund("refund.processed", "rfnd_A", 10000, 10000); // ₹100 back - partial
+    const store = makeStore(settings())!;
+    let o = (await store.getOrder(id))!;
+    expect(o.status).toBe("paid");
+    expect(o.history.at(-1)!.note).toBe("Partial refund of ₹100 processed (Razorpay rfnd_A)");
+    await refund("refund.processed", "rfnd_A", 10000, 10000); // Razorpay retries: nothing new
+    expect((await store.getOrder(id))!.history).toHaveLength(o.history.length);
+
+    await refund("refund.created", "rfnd_B", 52800, 10000);
+    await refund("refund.processed", "rfnd_B", 52800, 62800); // the rest
+    o = (await store.getOrder(id))!;
+    expect(o.status).toBe("refunded");
+    const pay = o.payment as { refunds: { id: string; amount: number; status: string }[]; amount_refunded: number };
+    expect(pay.refunds.map((r) => [r.id, r.amount, r.status])).toEqual([["rfnd_A", 100, "processed"], ["rfnd_B", 528, "processed"]]);
+    expect(pay.amount_refunded).toBe(628);
+    expect(o.history.map((h) => h.status)).toEqual(["pending", "paid", "paid", "paid", "refunded"]);
+  });
+});
+
 describe("Supabase requests", () => {
   afterEach(() => vi.unstubAllGlobals());
   const record = (replies: [number, unknown][]) => {

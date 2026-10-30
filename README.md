@@ -139,6 +139,7 @@ Switch it on again and it all comes back. The choice is stored in Supabase (`pro
 3. **Payment:** Razorpay Checkout (UPI, cards, net banking, wallets).
    - The server checks Razorpay's signature before marking the order paid.
    - The webhook confirms the payment too, even if the shopper closes the tab.
+   - Refunds are made in the Razorpay dashboard; the webhook records each one on the order (shown in the admin), and a full refund moves the order to Refunded.
 4. **Order page `/order/?id=…&t=…`:** confirmation, a status timeline, a reminder if photos are missing, and courier tracking once shipped. `/track-order/` finds it again from the order number plus email or phone.
 5. **Admin `/admin/`:** log in with an admin account. Tabs are New (paid, to print), Printing, Shipped, Delivered, Unpaid and Cancelled. No refreshing needed: the dashboard checks every 30 seconds and a new paid order pops up with a chime (sound starts after your first click on the page). Orders paid with the test payment window, Razorpay test keys or a team test account are labelled **Test** and can be deleted; real orders can't. Open an order to:
    - see the customer and address (copy button) and the items with options and captions
@@ -161,7 +162,7 @@ On Vercel a missing setting switches that feature off with a clear message, for 
 2. **Razorpay:**
    - Sign up and switch to **Test mode**.
    - Under **Account & Settings → API Keys**, generate a key pair.
-   - Under **Webhooks**, add `https://<your-site>/api/razorpay-webhook/` (keep the trailing slash). Choose a secret and the events `payment.captured`, `order.paid` and `payment.failed`.
+   - Under **Webhooks**, add `https://<your-site>/api/razorpay-webhook/` (keep the trailing slash). Choose a secret and the events `payment.captured`, `order.paid`, `payment.failed`, `refund.created`, `refund.processed` and `refund.failed`.
 3. **Vercel → Project → Settings → Environment Variables:** add the names listed in `.env.example`:
    - `JWT_SECRET`: required, 32+ random characters. Generate one with `node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"`.
    - `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET`, `SUPABASE_URL` and `SUPABASE_SECRET_KEY`.

@@ -1,8 +1,9 @@
 import { ApiError, handle, json, log } from "@/lib/server/http";
-import { markPaidChanges, withStatus } from "@/lib/server/orders";
+import { markPaidChanges, refundChanges, withStatus } from "@/lib/server/orders";
 import { slimPayment } from "@/lib/server/payments";
 
-/** Razorpay -> us. Marks orders paid even if the customer closed the tab before the redirect. */
+/** Razorpay -> us. Marks orders paid even if the customer closed the tab before the redirect, and records refunds
+ *  made in the Razorpay dashboard (refund.created / refund.processed / refund.failed). */
 export const POST = handle(async (ctx) => {
   const gw = ctx.gateway;
   if (gw.name !== "razorpay") throw new ApiError(404, "Not found");
@@ -12,10 +13,16 @@ export const POST = handle(async (ctx) => {
   const event = JSON.parse(raw.toString("utf8"));
   const kind: string = event.event ?? "";
   const pay = event.payload?.payment?.entity ?? {};
-  if (!["payment.captured", "order.paid", "payment.failed"].includes(kind) || !pay.order_id) return json({ ok: true, ignored: kind });
+  const isRefund = kind.startsWith("refund.");
+  if (!(["payment.captured", "order.paid", "payment.failed"].includes(kind) || isRefund) || !pay.order_id) return json({ ok: true, ignored: kind });
   const store = ctx.store;
   const order = await store.findByRazorpayOrder(pay.order_id);
   if (!order) return json({ ok: true, ignored: "unknown order" });
+  if (isRefund) {
+    const changes = refundChanges(order, kind, event.payload?.refund?.entity ?? {}, Number(pay.amount_refunded ?? 0));
+    if (changes) await store.updateOrder(order.id, changes);
+    return json({ ok: true });
+  }
   if (kind === "payment.failed") {
     if (order.status === "pending") {
       await store.updateOrder(order.id, withStatus(order, "pending", `Payment attempt failed: ${String(pay.error_description || "no reason given").slice(0, 140)}`), ["pending"]);

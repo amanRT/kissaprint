@@ -268,7 +268,7 @@ function OrderDetail({ order: o, photos, say, onSaved, onDeleted, signedOut }: {
   const [saving, setSaving] = useState(false);
   const [zipping, setZipping] = useState<string | null>(null);
   const c = o.customer;
-  const pay = (o.payment ?? {}) as { method?: string; vpa?: string; card?: { network?: string; last4?: string } };
+  const pay = (o.payment ?? {}) as { method?: string; vpa?: string; card?: { network?: string; last4?: string }; refunds?: { id: string; amount: number; status: string; at: string }[] };
   const totalPhotos = o.items.reduce((n, it) => n + it.photos.length, 0);
   const test = ["mock", "razorpay_test", "bypass"].includes(o.gateway);
   const address = [c.name, o.address.line1, o.address.line2, `${o.address.city}, ${o.address.state} ${o.address.pincode}`, phoneDisplay(c.phone)].filter(Boolean).join("\n");
@@ -366,6 +366,7 @@ function OrderDetail({ order: o, photos, say, onSaved, onDeleted, signedOut }: {
           <>
             <p>{pay.method ? pay.method.toUpperCase() : "Paid"}{pay.vpa ? ` · ${pay.vpa}` : ""}{pay.card ? ` · ${pay.card.network ?? ""} ${pay.card.last4 ? "•••• " + pay.card.last4 : ""}` : ""}</p>
             <p className="adm-mono">{o.razorpay_payment_id}</p>
+            {pay.refunds?.map((r) => <p key={r.id} className={r.status === "failed" ? "adm-warn" : "muted"}>Refund {inr(r.amount)} · {r.status} · {when(r.at)} <span className="adm-mono">{r.id}</span></p>)}
             {o.gateway === "mock" ? <p className="muted">Local test payment</p>
               : <p><a href={`https://dashboard.razorpay.com/app/payments/${encodeURIComponent(o.razorpay_payment_id)}`} target="_blank" rel="noopener">Open in Razorpay{o.gateway === "razorpay_test" ? " (test mode)" : ""} ↗</a></p>}
           </>

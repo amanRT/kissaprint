@@ -114,6 +114,30 @@ export function markPaidChanges(order: Order, paymentId: string, payment: Record
   return withStatus(order, "paid", `Payment received${method ? ` by ${method}` : ""} (${via})`, { razorpay_payment_id: paymentId, payment: payment ?? { id: paymentId } });
 }
 
+export type Refund = { id: string; amount: number; status: string; at: string };
+
+/** Razorpay refund event -> changes to the order, or null if there's nothing new (duplicate delivery).
+ *  Refunds are kept in order.payment.refunds (amounts in rupees); a full refund moves the order to "refunded". */
+export function refundChanges(order: Order, kind: string, refund: { id?: unknown; amount?: unknown; status?: unknown }, refundedPaise: number): Partial<Order> | null {
+  const id = String(refund.id ?? "");
+  if (!id) return null;
+  const pay = (order.payment ?? {}) as Record<string, unknown> & { refunds?: Refund[] };
+  const refunds = pay.refunds ?? [];
+  const status = kind === "refund.processed" ? "processed" : kind === "refund.failed" ? "failed" : "created";
+  const known = refunds.find((r) => r.id === id);
+  if (known && (known.status === status || known.status === "processed")) return null; // already recorded
+  const amount = Math.round(Number(refund.amount ?? 0)) / 100;
+  const entry: Refund = { id, amount, status, at: now() };
+  const payment = { ...pay, refunds: [...refunds.filter((r) => r.id !== id), entry], amount_refunded: Math.round(refundedPaise) / 100 };
+  const rupees = `₹${amount.toLocaleString("en-IN")}`;
+  if (status === "processed" && refundedPaise >= order.total * 100) {
+    return withStatus(order, "refunded", `Refunded ${rupees} in full (Razorpay ${id})`, { payment });
+  }
+  const note = status === "processed" ? `Partial refund of ${rupees} processed (Razorpay ${id})`
+    : status === "failed" ? `Refund of ${rupees} FAILED - check Razorpay (${id})` : `Refund of ${rupees} started (Razorpay ${id})`;
+  return withStatus(order, order.status, note, { payment });
+}
+
 export function contactMatches(order: Order, contact: unknown): boolean {
   const raw = String(contact ?? "").trim().toLowerCase();
   if (!raw) return false;
