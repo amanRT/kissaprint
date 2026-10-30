@@ -14,7 +14,9 @@ type RazorpayCtor = new (options: Record<string, unknown>) => { open(): void; on
 
 const EMPTY: Fields = { name: "", phone: "", email: "", line1: "", line2: "", pincode: "", city: "", state: "" };
 const relogin = () => location.assign("/login/?expired=1&next=%2Fcheckout%2F");
-const read = <T,>(key: string, fallback: T): T => { try { return (JSON.parse(localStorage.getItem(key) || "null") as T) ?? fallback; } catch { return fallback; } };
+// The cart lives on the shopper's account (nothing is stored in the browser); empty it once the order is placed.
+const clearCart = () => api("/api/cart/", { items: [] }, { method: "PUT" }).catch(() => {});
+type CartRes = { signedIn: boolean; items: CartItem[]; quote?: QuoteRes; quote_error?: string; prefill: { phone: string; address: { line1: string; line2: string; city: string; state: string; pincode: string } } | null };
 const digits = (v: string) => v.replace(/\D/g, "").replace(/^(?:91|0)(?=\d{10}$)/, "");
 
 // Same rules as the server (lib/server/orders.ts), checked here first so mistakes show instantly.
@@ -41,6 +43,7 @@ const loadRazorpay = () => (razorpayScript ??= new Promise<void>((resolve, rejec
 
 export function CheckoutForm({ states, dispatch, delivery, icons }: { states: string[]; dispatch: string; delivery: string; icons: Record<"sparkle" | "bag" | "shield", React.ReactNode> }) {
   const [cart, setCart] = useState<CartItem[] | null>(null);
+  const [loadError, setLoadError] = useState("");
   const [quote, setQuote] = useState<QuoteRes | null>(null);
   const [fields, setFields] = useState<Fields>(EMPTY);
   const [error, setError] = useState<{ message: string; field?: string } | null>(null);
@@ -52,26 +55,31 @@ export function CheckoutForm({ states, dispatch, delivery, icons }: { states: st
   const mockRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
-    const items = read<CartItem[]>("kp-cart2", []);
-    setCart(items);
-    const saved = read<Partial<Fields>>("kp-checkout", {});
-    setFields((f) => ({ ...f, ...Object.fromEntries(Object.entries(saved).filter(([, v]) => typeof v === "string")) }));
-    // Ordering needs an account (proxy.ts sends signed-out shoppers to log in first). Fill in name and email from it;
-    // if the session has ended since (revoked or expired), log in again and come straight back here.
+    // Ordering needs an account (proxy.ts sends signed-out shoppers to log in first). Name and email come from it,
+    // phone and address from their last order; if the session has ended since, log in again and come straight back.
     api<{ user: { name: string; email: string } | null }>("/api/auth/me/").then(({ user }) => {
       if (!user) relogin();
       else setFields((f) => ({ ...f, name: f.name || user.name, email: f.email || user.email }));
     }).catch(() => {});
-    if (!items.length) return;
-    api<QuoteRes>("quote", { items: lineItems(items) }).then((q) => {
+    // One request: the cart from the account, priced on the server (no second round trip for the quote).
+    api<CartRes>("/api/cart/?quote=1").then(({ signedIn, items, prefill, quote: q, quote_error }) => {
+      if (!signedIn) { relogin(); return; }
+      setCart(items);
+      if (prefill) setFields((f) => ({ ...f, phone: f.phone || prefill.phone, line1: f.line1 || prefill.address.line1, line2: f.line2 || prefill.address.line2,
+        city: f.city || prefill.address.city, state: f.state || prefill.address.state, pincode: f.pincode || prefill.address.pincode }));
+      if (quote_error) setError({ message: quote_error });
+      if (!q) return;
       setQuote(q);
       if (q.payments === "off") setError({ message: "Online payments are being set up, so orders can't be paid just yet." });
-    }).catch((err) => setError({ message: (err as Error).message }));
+    }).catch((err) => {
+      if ((err as ApiError).status === 401) relogin();
+      else setLoadError((err as Error).message); // never pretend the cart is empty when it just didn't load
+    });
   }, []);
   useEffect(() => { if (mock) mockRef.current?.showModal(); }, [mock]);
 
-  const lineItems = (items: CartItem[]) => items.map((c) => ({ slug: c.slug, qty: c.qty, opts: c.opts || {}, note: c.note || "", photos: c.photos || [] }));
-  const payLabel = quote ? `Pay ${inr(quote.total)} securely` : "Pay securely";
+  const lineItems = (items: CartItem[]) => items.map((c) => ({ slug: c.slug, qty: c.qty, opts: c.opts || {}, note: c.note || "", photos: c.photos || [], ...(c.layout ? { layout: c.layout } : {}) }));
+  const payLabel = quote ? `Pay ${inr(quote.total)} securely` : error ? "Pay securely" : "Getting your total…";
 
   const showError = (message: string, field?: string) => {
     setError({ message, field });
@@ -88,7 +96,7 @@ export function CheckoutForm({ states, dispatch, delivery, icons }: { states: st
       if (status === 400 || status === 409) { setBusy(null); showError((err as Error).message); return; }
       // Network trouble: Razorpay's webhook still confirms the payment, and the order page shows the live status.
     }
-    localStorage.removeItem("kp-cart2");
+    await clearCart();
     location.assign(`/order/?id=${encodeURIComponent(order.id)}&t=${encodeURIComponent(order.token)}&new=1`);
   };
   const cancelled = () => { setBusy(null); showError("Payment cancelled. Your details are saved - try again whenever you're ready."); };
@@ -113,7 +121,6 @@ export function CheckoutForm({ states, dispatch, delivery, icons }: { states: st
     if (problem) { showError(problem[1], problem[0]); return; }
     setError(null);
     const t = Object.fromEntries(Object.entries(fields).map(([k, v]) => [k, v.trim()])) as Fields;
-    localStorage.setItem("kp-checkout", JSON.stringify(t));
     const body = { items: lineItems(cart), customer: { name: t.name, phone: t.phone, email: t.email },
       address: { line1: t.line1, line2: t.line2, pincode: t.pincode, city: t.city, state: t.state } };
     const key = JSON.stringify(body);
@@ -122,7 +129,7 @@ export function CheckoutForm({ states, dispatch, delivery, icons }: { states: st
       if (!placed.current || placed.current.key !== key) placed.current = { key, data: await api<Placed>("orders", body) };
       const { order, payment } = placed.current.data;
       if (payment.gateway === "bypass") { // team test account: the server skipped payment and saved a test order
-        localStorage.removeItem("kp-cart2");
+        await clearCart();
         location.assign(`/order/?id=${encodeURIComponent(order.id)}&t=${encodeURIComponent(order.token)}&new=1`);
       } else if (payment.gateway === "mock") setMock(placed.current.data);
       else await razorpay(order, payment);
@@ -141,6 +148,16 @@ export function CheckoutForm({ states, dispatch, delivery, icons }: { states: st
   const focusOnce = useRef(false);
   const onFocus = () => { if (!focusOnce.current && quote?.payments === "razorpay") { focusOnce.current = true; loadRazorpay().catch(() => {}); } };
 
+  if (loadError) {
+    return (
+      <div className="co-empty" data-co-load-error role="alert">
+        {icons.bag}
+        <h2 className="h3">We couldn&apos;t load your cart</h2>
+        <p className="muted">{loadError} Your items are safe on your account.</p>
+        <button type="button" className="btn btn--kiss" onClick={() => location.reload()}>Try again</button>
+      </div>
+    );
+  }
   if (cart && !cart.length) {
     return (
       <div className="co-empty" data-co-empty>
@@ -196,7 +213,7 @@ export function CheckoutForm({ states, dispatch, delivery, icons }: { states: st
           </section>
         </form>
 
-        <aside className="co-summary" aria-labelledby="co-sum-title">
+        <aside className="co-summary" aria-labelledby="co-sum-title" aria-busy={!quote && !error ? true : undefined}>
           <h2 id="co-sum-title">Order summary</h2>
           <ul className="co-lines" data-co-lines>
             {!quote ? <li className="co-loading">Loading your cart…</li> : quote.lines.map((ln, i) => {

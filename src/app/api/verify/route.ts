@@ -4,10 +4,11 @@ import { PaymentError, slimPayment } from "@/lib/server/payments";
 
 /** The browser's success callback from Razorpay Checkout. The webhook confirms independently. */
 export const POST = handle(async (ctx) => {
+  const user = await ctx.requireUser(); // proxy.ts checks the cookie first
   const data = await ctx.body();
   const store = ctx.store;
   const order = await store.getOrder(String(data.id ?? ""));
-  if (!order) throw new ApiError(404, "Order not found");
+  if (!order || (order.user_id && order.user_id !== user.id)) throw new ApiError(404, "Order not found"); // only your own orders
   if (PAID.includes(order.status)) return json({ ok: true, id: order.id, status: order.status });
   if (order.status !== "pending") throw new ApiError(409, "This order was cancelled - please contact us");
   const gw = ctx.gateway;

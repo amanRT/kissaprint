@@ -111,7 +111,8 @@ const CARD_WIDTHS = [360, 640];
 export function ProductCard({ p, priority = false }: { p: Product; priority?: boolean }) {
   return (
     <article className="card">
-      <div className="card__media">
+      {/* Same view-transition name as the product page's main photo: the photo flows from card to page (main.css). */}
+      <div className="card__media" style={{ viewTransitionName: `p-${p.slug}` }}>
         <Picture name={p.slug} alt={`${p.name} - ${p.meta}`} sizes={CARD_SIZES} widths={CARD_WIDTHS} priority={priority} />
         <Badges p={p} />
         <span className="card__quick" aria-hidden="true">Personalise <Icon name="arrow-right" /></span>

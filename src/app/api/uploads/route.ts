@@ -5,6 +5,7 @@ import { hiddenNow } from "@/lib/server/visibility";
 
 /** One-time upload URLs for up to 20 photos; the browser PUTs each file straight to storage. */
 export const POST = handle(async (ctx) => {
+  await ctx.requireUser(); // photos belong to an account (proxy.ts checks the cookie first)
   const data = await ctx.body();
   const files = data.files;
   if (!Array.isArray(files) || files.length < 1 || files.length > 20) throw new ApiError(400, "Send between 1 and 20 photos at a time");

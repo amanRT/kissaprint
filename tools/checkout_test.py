@@ -128,6 +128,9 @@ def main():
         d.get(base + "/account/")
         check("account page needs a log-in", until(lambda: "/login/" in d.current_url), d.current_url.replace(base, ""))
         path = lambda: urlsplit(d.current_url).path  # noqa: E731
+        d.get(base + "/products/classic-memoroids/")
+        check("signed out, the product page asks to log in before adding photos",
+              until(lambda: q("[data-login-to-upload]").is_displayed() and "Log in to order" in q("[data-login-to-buy]").text, 15))
         # Ordering needs an account (like Amazon): checkout sends signed-out shoppers to log in, then back.
         d.get(base + "/checkout/")
         check("checkout needs a log-in", until(lambda: path() == "/login/" and "next=%2Fcheckout%2F" in d.current_url), d.current_url.replace(base, ""))
@@ -145,8 +148,8 @@ def main():
         heading = until(lambda: path() == "/account/" and q("h1").text, 15)
         check("sign-up logs the customer in", heading == f"Hi, {shopper['name'].split()[0]}", heading)
         d.get(base + "/admin/")
-        check("customers can't open /admin/", until(lambda: path() == "/account/" and "denied=1" in d.current_url), d.current_url.replace(base, ""))
-        check("…and are told why", "for the KissaPrints team" in q(".account .co-error").text)
+        check("customers can't open /admin/ - sent to the homepage", until(lambda: path() == "/"), d.current_url.replace(base, ""))
+        check("…and keep their session", any(c["name"] == "kp_session" for c in d.get_cookies()))
         check("admin API answers 403 for customers", fetch_status("/api/admin/orders/") == 403)
 
         d.get(base + "/products/classic-memoroids/")
@@ -163,6 +166,7 @@ def main():
         shot("1-product")
         click(q("[data-add]"))
         check("add to cart opens the cart", until(lambda: js("return document.getElementById('cart-drawer').open")))
+        check("the cart is saved to the account", until(lambda: len(js("return fetch('/api/cart/').then(r => r.json())").get("items", [])) == 1, 10))
         note = until(lambda: q(".cart-item__photos").get_attribute("textContent"))
         check("cart line shows the photos", "3 of 30 photos added" in (note or ""), note)
         time.sleep(0.5)  # let the drawer finish sliding in
@@ -187,6 +191,17 @@ def main():
         shot("3-checkout")
         click(q("[data-pay]"))
         check("payment window opens", until(lambda: js("return !!document.querySelector('dialog.mock-pay[open]')"), 15))
+        # Cancel first: no order for the customer, the cart keeps everything, and paying later still works.
+        click(q("dialog.mock-pay button[value=cancel]"))
+        check("cancelling the payment says so", until(lambda: "cancelled" in q("[data-co-error]").text.lower(), 10), q("[data-co-error]").text)
+        check("…and keeps the cart", len(js("return fetch('/api/cart/').then(r => r.json())").get("items", [])) == 1)
+        d.get(base + "/account/")
+        check("a cancelled checkout isn't listed under Your orders", until(lambda: "No orders yet" in q(".account").text), q(".account").text[:120])
+        d.get(base + "/checkout/")
+        wait_ready(d)
+        until(lambda: q("[data-pay]").is_enabled() and "₹1,198" in q("[data-pay]").text, 20)
+        click(q("[data-pay]"))
+        check("paying after a cancel opens the payment window again", until(lambda: js("return !!document.querySelector('dialog.mock-pay[open]')"), 15))
         shot("4-payment")
         click(q("dialog.mock-pay button[value=pay]"))
         until(lambda: "/order/" in d.current_url, 20)
@@ -195,7 +210,11 @@ def main():
         params = parse_qs(urlsplit(d.current_url).query)
         order_id, token = params["id"][0], params["t"][0]
         check("timeline + missing-photos reminder", "3 of 30 received" in q(".order-note").text and len(d.find_elements(By.CSS_SELECTOR, ".timeline li")) == 4)
-        check("cart is emptied after paying", js("return localStorage.getItem('kp-cart2') === null || localStorage.getItem('kp-cart2') === '[]'"))
+        saved = js("return fetch('/api/cart/').then(r => r.json())")
+        check("cart (kept on the account) is emptied after paying", saved.get("items") == [], str(saved)[:80])
+        check("nothing is stored in localStorage", js("return localStorage.length") == 0, js("return Object.keys(localStorage)"))
+        jar = d.get_cookies()
+        check("exactly one cookie: the HttpOnly session", [c["name"] for c in jar] == ["kp_session"] and jar[0].get("httpOnly"), [(c["name"], c.get("httpOnly")) for c in jar])
         shot("5-confirmation")
         d.get(base + "/account/")
         check("the order shows under Your account", until(lambda: order_id in q(".account__orders").text))

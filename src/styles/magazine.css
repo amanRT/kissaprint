@@ -1,0 +1,123 @@
+/* The "Kissa" magazine (components/magazine): pages, the flip-book and the A4 print view. Loaded only with the
+   magazine designer and the admin print view. Everything inside a page is sized in % and cqw (1% of the page
+   width), so a page looks the same as a thumbnail, in the flip-book and on A4 paper. */
+.mag-page { position: relative; aspect-ratio: 210 / 297; overflow: hidden; container-type: inline-size; background: #fffdf8; color: var(--ink); font-family: var(--font-sans); }
+.mag-page--blush { background: #fde5e6; }
+.mag-page--sky { background: #e2eefc; }
+.mag-page--butter { background: #fff3c6; }
+.mag-page--ink { background: #1b1414; color: #fff; }
+
+.mag-t { position: absolute; }
+.mag-center { text-align: center; }
+.mag-right { text-align: right; }
+.mag-masthead { font: italic 400 34cqw/.8 var(--font-serif); letter-spacing: -.035em; color: #fff; text-shadow: 0 .6cqw 3cqw rgba(0, 0, 0, .25); }
+.mag-mini-mast { font: italic 400 9cqw/1 var(--font-serif); color: var(--kiss); }
+.mag-kicker { font-size: 2.1cqw; font-weight: 800; line-height: 1.35; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-3, #6b5f5a); }
+.mag-kicker.is-red { color: var(--kiss); }
+.mag-kicker.is-light { color: rgba(255, 255, 255, .85); }
+.mag-kicker.is-butter { color: var(--butter); }
+.mag-rule { padding-bottom: 1.4cqw; border-bottom: .3cqw solid currentColor; }
+.mag-h1 { font: italic 400 11cqw/.95 var(--font-serif); letter-spacing: -.025em; }
+.mag-body { font-size: 2.75cqw; line-height: 1.5; }
+.mag-body.is-small { font-size: 2.35cqw; }
+.mag-body.is-light { color: rgba(255, 255, 255, .82); }
+.mag-dropcap::first-letter { float: left; margin: .4cqw 1.2cqw 0 0; font: italic 400 9.5cqw/.8 var(--font-serif); color: var(--kiss); }
+.mag-caption { font-size: 2.1cqw; line-height: 1.4; color: var(--ink-3, #6b5f5a); }
+.mag-hand { font: 600 4.4cqw/1.05 var(--font-hand); color: #3a2f2b; }
+.mag-hand.is-big { font-size: 6cqw; }
+.mag-sign { color: var(--kiss); }
+.mag-quote { font: italic 400 6.6cqw/1.02 var(--font-serif); letter-spacing: -.015em; }
+.mag-quote.is-big { font-size: 10cqw; line-height: .95; }
+.mag-coverline { font-size: 3.6cqw; font-weight: 800; line-height: 1.05; letter-spacing: -.01em; color: #fff; text-shadow: 0 .3cqw 1.5cqw rgba(0, 0, 0, .35); }
+.mag-coverline.is-small { font-size: 2.6cqw; font-weight: 600; }
+.mag-tag { padding: .8cqw 1.8cqw; background: var(--kiss); color: #fff; font-size: 2.1cqw; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; }
+.mag-cover-title { font: italic 400 12.5cqw/.92 var(--font-serif); letter-spacing: -.02em; color: #fff; text-shadow: 0 .4cqw 2.5cqw rgba(0, 0, 0, .3); overflow-wrap: anywhere; }
+.mag-cover-sub { font-size: 2.7cqw; font-weight: 600; line-height: 1.3; color: rgba(255, 255, 255, .92); }
+.mag-folio { position: absolute; left: 8%; right: 8%; bottom: 3%; display: flex; justify-content: space-between; font-size: 1.8cqw; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3, #6b5f5a); }
+.mag-folio.is-light { color: rgba(255, 255, 255, .7); }
+.mag-shade { position: absolute; left: 0; right: 0; pointer-events: none; }
+.mag-shade--top { top: 0; height: 34%; background: linear-gradient(rgba(0, 0, 0, .5), transparent); }
+.mag-shade--bottom { bottom: 0; height: 45%; background: linear-gradient(transparent, rgba(0, 0, 0, .62)); }
+.mag-shade--bottom.is-deep { height: 55%; background: linear-gradient(transparent, rgba(0, 0, 0, .78)); }
+.mag-barcode { position: absolute; padding: 1cqw; background: #fff; }
+.mag-barcode::before { content: ""; position: absolute; inset: 1cqw 1cqw 2.6cqw; background: repeating-linear-gradient(90deg, #111 0 .35cqw, transparent .35cqw .7cqw, #111 .7cqw .85cqw, transparent .85cqw 1.5cqw); }
+.mag-stamp { position: absolute; display: grid; place-items: center; border: .5cqw dashed var(--kiss); border-radius: 50%; color: var(--kiss); font-size: 2.4cqw; font-weight: 800; line-height: 1.1; letter-spacing: .12em; text-align: center; text-transform: uppercase; }
+
+/* Photo spots */
+.mag-slot { position: absolute; }
+.mag-slot__photo { position: relative; width: 100%; height: 100%; overflow: hidden; background: #e9e2da; touch-action: none; }
+.mag-slot__photo img { display: block; width: 100%; height: 100%; object-fit: cover; user-select: none; -webkit-user-drag: none; pointer-events: none; }
+.mag-slot__photo img.is-sample { opacity: .5; filter: saturate(.6); }
+.mag-slot--round .mag-slot__photo { border-radius: 2.5cqw; }
+.mag-slot--polaroid { padding: 2.2cqw 2.2cqw 7.5cqw; background: #fff; box-shadow: 0 1.5cqw 4cqw -1cqw rgba(0, 0, 0, .35); }
+.mag-slot__add { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: .6cqw; padding: 2cqw; border: .45cqw dashed rgba(27, 20, 20, .5);
+  background: rgba(255, 253, 248, .55); color: var(--ink); font: 700 max(10px, 2.6cqw)/1.2 var(--font-sans); text-align: center; cursor: pointer; }
+.mag-slot__add span { display: grid; place-items: center; width: max(26px, 7cqw); height: max(26px, 7cqw); border-radius: 50%; background: var(--kiss); color: #fff; font-size: max(18px, 5cqw); font-weight: 600; line-height: 1; }
+.mag-slot__add:hover, .mag-slot__add:focus-visible { background: rgba(255, 253, 248, .8); border-color: var(--kiss); outline: none; }
+[data-editable] .mag-slot__photo[data-filled] { cursor: grab; }
+[data-editable] .mag-slot__photo[data-filled]:active { cursor: grabbing; }
+[data-editable] .mag-slot:hover .mag-slot__photo[data-filled], .mag-slot.is-active .mag-slot__photo { outline: max(2px, .5cqw) solid var(--kiss); outline-offset: calc(-1 * max(2px, .5cqw)); }
+.mag-slot__state { position: absolute; left: 50%; bottom: 6%; transform: translateX(-50%); padding: .6em 1em; border: 0; border-radius: 99px; background: rgba(27, 20, 20, .8); color: #fff;
+  font: 700 max(10px, 2.2cqw)/1 var(--font-sans); white-space: nowrap; background-image: linear-gradient(90deg, rgba(215, 38, 61, .9) var(--pct, 0%), transparent var(--pct, 0%)); }
+.mag-slot__state.is-err { background: var(--kiss); cursor: pointer; }
+.mag-slot__bar { position: absolute; left: 50%; bottom: 4%; z-index: 2; display: flex; gap: 4px; transform: translateX(-50%); padding: 4px; border-radius: 99px; background: rgba(27, 20, 20, .88); }
+.mag-slot__bar button { padding: .45em .9em; border: 0; border-radius: 99px; background: transparent; color: #fff; font: 700 max(11px, 2.3cqw)/1 var(--font-sans); cursor: pointer; }
+.mag-slot__bar button:hover, .mag-slot__bar button:focus-visible { background: rgba(255, 255, 255, .18); outline: none; }
+
+/* Flip-book: leaves turn around the spine (two-page spreads), or one page at a time on narrow screens */
+.flip { display: grid; justify-items: center; gap: 14px; width: 100%; }
+.flip-stage { position: relative; width: 100%; perspective: 2600px; touch-action: pan-y; outline: none; }
+.flip-stage.is-single { overflow: hidden; }
+.flip-book { position: relative; margin-inline: auto; transition: transform .7s cubic-bezier(.645, .045, .355, 1); }
+.flip-stage.is-spread .flip-book { width: min(100%, var(--book-w, 900px)); aspect-ratio: 420 / 297; }
+.flip-stage.is-single .flip-book { width: min(100%, var(--page-w, 420px)); aspect-ratio: 210 / 297; }
+.flip-stage.is-spread .flip-book.is-closed-front { transform: translateX(-25%); }
+.flip-stage.is-spread .flip-book.is-closed-back { transform: translateX(25%); }
+.flip-leaf { position: absolute; top: 0; height: 100%; transform-origin: left center; transform-style: preserve-3d; transition: transform .9s cubic-bezier(.645, .045, .355, 1); }
+.is-spread .flip-leaf { left: 50%; width: 50%; }
+.is-single .flip-leaf { left: 0; width: 100%; }
+.flip-leaf.is-flipped { transform: rotateY(-180deg); }
+.is-single .flip-leaf.is-flipped { opacity: 0; transition: transform .9s cubic-bezier(.645, .045, .355, 1), opacity .25s .6s; }
+.flip-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; box-shadow: 0 18px 40px -18px rgba(27, 20, 20, .45); }
+.flip-face--back { transform: rotateY(180deg); }
+.flip-face--blank { background: #f4eee6; }
+.flip-face::after { content: ""; position: absolute; inset: 0; pointer-events: none; }
+.is-spread .flip-face--front::after { background: linear-gradient(90deg, rgba(0, 0, 0, .16), transparent 7%); }
+.is-spread .flip-face--back::after { background: linear-gradient(270deg, rgba(0, 0, 0, .16), transparent 7%); }
+.flip-bar { display: flex; align-items: center; justify-content: center; gap: 14px; }
+.flip-bar__label { min-width: 9.5em; font-size: .9375rem; font-weight: 700; text-align: center; }
+.flip-btn { display: grid; place-items: center; width: 44px; height: 44px; border: 1.5px solid var(--line-2, #ddd); border-radius: 50%; background: var(--white, #fff); color: var(--ink); cursor: pointer; }
+.flip-btn:disabled { opacity: .35; cursor: default; }
+.flip-btn svg { width: 18px; height: 18px; }
+.flip-dots { display: flex; gap: 6px; }
+.flip-dots button { width: 8px; height: 8px; padding: 0; border: 0; border-radius: 50%; background: var(--line-2, #ddd); cursor: pointer; }
+.flip-dots button[aria-current="true"] { width: 22px; border-radius: 99px; background: var(--kiss); }
+@media (prefers-reduced-motion: reduce) { .flip-leaf, .flip-book { transition-duration: .01ms !important; } }
+
+/* Designer (full-screen dialog on the product page) */
+.mag-editor { width: 100%; max-width: none; height: 100dvh; max-height: none; margin: 0; background: var(--paper-2, #f6efe7); }
+.mag-editor[open] { display: grid; grid-template-rows: auto 1fr auto; }
+.mag-editor__top { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; padding: 12px var(--gutter, 20px); border-bottom: 1px solid var(--line, #eee); background: var(--paper, #fff); }
+.mag-editor__top h2 { font-size: 1.125rem; font-weight: 800; }
+.mag-editor__count { padding: 4px 12px; border-radius: 99px; background: var(--paper-2, #f6efe7); font-size: .875rem; font-weight: 700; }
+.mag-editor__count.is-done { background: var(--mint, #d3f0de); }
+.mag-editor__actions { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
+/* Fit the book to the screen height, so a whole spread is visible without scrolling. */
+.mag-editor .flip-stage { --book-w: min(1040px, calc((100dvh - 250px) * 1.414)); --page-w: min(460px, calc((100dvh - 270px) * .707)); }
+.mag-editor__main { display: grid; place-items: center; overflow: auto; padding: clamp(14px, 3vw, 32px) var(--gutter, 20px); }
+.mag-editor__hint { padding: 10px var(--gutter, 20px) calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line, #eee); background: var(--paper, #fff);
+  color: var(--ink-2, #555); font-size: .875rem; text-align: center; }
+
+/* Admin print view: one A4 sheet per page */
+.mag-print { display: grid; justify-items: center; gap: 24px; padding: 24px; }
+.mag-print .mag-page { width: 210mm; box-shadow: 0 10px 30px -12px rgba(0, 0, 0, .3); }
+.mag-print__bar { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; width: 100%; max-width: 210mm; padding: 12px 16px; border-radius: 14px; background: #fff; box-shadow: 0 6px 20px -10px rgba(0, 0, 0, .3); }
+.mag-print__bar strong { margin-right: auto; }
+@media print {
+  @page { size: A4; margin: 0; }
+  body * { visibility: hidden; }
+  .mag-print, .mag-print * { visibility: visible; }
+  .mag-print { position: absolute; inset: 0; display: block; padding: 0; }
+  .mag-print__bar { display: none; }
+  .mag-print .mag-page { width: 210mm; height: 297mm; box-shadow: none; break-after: page; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+}

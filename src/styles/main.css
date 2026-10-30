@@ -104,7 +104,6 @@ h1, h2, h3 { text-wrap: balance; }
   transition: transform .2s var(--ease), background-color .2s, border-color .2s, box-shadow .2s, color .2s;
 }
 .btn:hover { transform: translateY(-2px); box-shadow: 0 12px 22px -12px rgba(27, 20, 20, .55); }
-.btn:active { transform: translateY(0); }
 .btn--kiss { --bg: var(--kiss); --fg: #fff; }
 .btn--kiss:hover { --bg: var(--kiss-600); box-shadow: 0 14px 26px -12px rgba(215, 38, 61, .65); }
 .btn--ghost { --bg: transparent; --fg: var(--ink); border-color: var(--line-2); }
@@ -771,6 +770,13 @@ dialog::backdrop { background: rgba(27, 20, 20, .45); -webkit-backdrop-filter: b
 .choice:hover span { border-color: var(--ink); }
 .choice input:checked + span { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
 .choice input:focus-visible + span { outline: 2.5px solid var(--kiss); outline-offset: 2px; }
+/* Magazine designer entry point (the editor itself is in magazine.css, loaded on demand) */
+.designer-card__body { display: grid; gap: 14px; padding: 18px; border: 2px solid var(--blush); border-radius: var(--radius); background: linear-gradient(135deg, var(--white), #fff4f5); }
+.designer-card__body strong { display: block; font-size: 1.0625rem; }
+.designer-card__body span { font-size: .9375rem; color: var(--ink-2); }
+@media (min-width: 560px) { .designer-card__body { grid-template-columns: minmax(0, 1fr) auto; align-items: center; } }
+a.dropzone { color: inherit; text-decoration: none; }
+#personalise { scroll-margin-top: 90px; } /* below the sticky header when arriving at #personalise */
 .dropzone { position: relative; display: grid; justify-items: center; gap: 4px; padding: 22px 18px; border: 2px dashed var(--line-2); border-radius: var(--radius); background: var(--white); text-align: center; cursor: pointer; transition: border-color .2s, background-color .2s; }
 .dropzone:hover, .dropzone.is-over { border-color: var(--kiss); background: var(--kiss-50); }
 .dropzone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
@@ -872,12 +878,40 @@ textarea.input { height: auto; min-height: 140px; padding: 14px 16px; resize: ve
 .notfound p { max-width: 32rem; color: var(--ink-2); }
 .notfound .chips { justify-content: center; max-width: 40rem; }
 
-/* ---------- Motion: scroll-driven reveals (progressive enhancement, no JS) ---------- */
+/* ---------- Motion: scroll-driven reveals (progressive enhancement, no JS) ----------
+   Only below-the-fold content, only opacity + transform (no layout shift), and never the LCP element: listing grids
+   (#plp-grid) are left alone because their first card is what paints first. Browsers without scroll timelines - and
+   anyone with "reduce motion" on - simply see everything in place. */
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
-    .reveal { animation: reveal linear both; animation-timeline: view(); animation-range: entry 5% cover 22%; }
+    .reveal, .section-head, .spotlight__media, .spotlight__body, .usp, .score-card, .carousel, .accordion, .steps .step,
+    .grid-products:not(#plp-grid) .card, .ugc__cta {
+      animation: reveal linear both; animation-timeline: view(); animation-range: entry 5% cover 22%;
+    }
+    /* a gentle stagger across a row: every other card / step finishes a little later */
+    .grid-products:not(#plp-grid) .grid-item:nth-child(even) .card, .grid-products:not(#plp-grid) > :nth-child(even) .card,
+    .grid-products:not(#plp-grid) > .card:nth-child(even), .steps .step:nth-child(even), .usp:nth-child(even) { animation-range: entry 12% cover 28%; }
   }
 }
+
+/* Page transitions between pages of the site (CSS only, Chrome / Edge / Safari 18.2+; others just navigate).
+   The header stays put, the page cross-fades, and a product's photo flows from its card into the product page. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+}
+.site-header { view-transition-name: site-header; }
+::view-transition-old(root) { animation: .18s var(--ease) both vt-out; }
+::view-transition-new(root) { animation: .26s var(--ease) both vt-in; }
+::view-transition-group(*) { animation-duration: .38s; animation-timing-function: var(--ease); }
+@keyframes vt-out { to { opacity: 0; } }
+@keyframes vt-in { from { opacity: 0; transform: translateY(10px); } }
+
+/* Small feedback: buttons press in, the heart pops when something is saved */
+.btn:active { transform: translateY(0) scale(.97); }
+@media (prefers-reduced-motion: no-preference) {
+  .wish[aria-pressed="true"] .icon { animation: heart-pop .4s var(--ease); }
+}
+@keyframes heart-pop { 40% { transform: scale(1.35); } 70% { transform: scale(.92); } }
 @keyframes reveal { from { opacity: 0; transform: translateY(28px); } }
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,18 +1,8 @@
-import { site } from "@/lib/catalog";
-import { handle, json, type Ctx } from "@/lib/server/http";
-import { quote } from "@/lib/server/pricing";
-import { hiddenNow } from "@/lib/server/visibility";
+import { quoteResponse } from "@/lib/server/checkout-quote";
+import { handle, json } from "@/lib/server/http";
 
-/** Signed in with a team test account? Then checkout says the order will skip payment. */
-async function isTester(ctx: Ctx) {
-  const claims = await ctx.session();
-  return Boolean(claims && (await ctx.store.getUserById(claims.sub))?.is_tester);
-}
-
-/** The checkout summary, priced on the server. */
+/** The checkout summary, priced on the server. Signed-in shoppers only (proxy.ts checks the cookie first). */
 export const POST = handle(async (ctx) => {
-  const q = quote((await ctx.body()).items, await hiddenNow(ctx.store));
-  const lines = q.lines.map(({ photos, ...line }) => ({ ...line, photos: photos.length }));
-  return json({ lines, subtotal: q.subtotal, shipping: q.shipping, total: q.total, free_shipping_over: site.free_shipping_over,
-    payments: ctx.cfg.payments || "off", test_mode: ctx.cfg.testMode, test_account: await isTester(ctx) });
+  await ctx.requireUser();
+  return json(await quoteResponse(ctx, (await ctx.body()).items));
 });

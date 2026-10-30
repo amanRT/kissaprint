@@ -11,6 +11,10 @@ export const CUSTOMER_LABELS: Record<Status, string> = {
   shipped: "Shipped", delivered: "Delivered", cancelled: "Cancelled", refunded: "Refunded",
 };
 export const PAID: Status[] = ["paid", "printing", "shipped", "delivered"];
+/** Orders the customer sees under "Your orders": only ones that were actually paid (or a team test order). A checkout
+ *  that was opened and then cancelled stays out - the shopper still has everything in their cart, and the team
+ *  sees the attempt in the admin's Unpaid tab. */
+export const wasPaid = (o: Pick<Order, "history">) => (o.history ?? []).some((h) => h.status === "paid");
 // Test orders: local stand-in, Razorpay test keys, or a team test account (users.is_tester) - no real money moved.
 export const TEST_GATEWAYS = ["mock", "razorpay_test", "bypass"];
 export const ORDER_ID = /^KP-[2-9A-HJ-NP-Z]{6}$/;

@@ -24,6 +24,8 @@ export type User = {
 };
 export type NewUser = Pick<User, "email" | "name" | "password_hash"> & { is_admin?: boolean; is_tester?: boolean };
 export type UploadTarget = { key: string; method: "PUT"; url: string; headers: Record<string, string> };
+/** A shopper's cart lines (as the browser shows them) and wishlist slugs, kept on the account. */
+export type SavedCart = { items: unknown[]; wishlist: string[] };
 /** Admin-controlled product state. Only products someone has changed have a row; everything else is visible. */
 export type ProductSetting = { slug: string; hidden: boolean; updated_at: string; updated_by: string };
 export type ListOptions = { statuses?: readonly Status[] | null; q?: string; limit?: number; oldestFirst?: boolean; userId?: string };
@@ -46,6 +48,9 @@ export interface Store {
   getUserByEmail(email: string): Promise<User | null>;
   getUserById(id: string): Promise<User | null>;
   updateUser(id: string, changes: Partial<User>): Promise<User | null>;
+  getCart(userId: string): Promise<SavedCart>;
+  /** Upsert; only the parts given change. */
+  saveCart(userId: string, cart: Partial<SavedCart>): Promise<void>;
   productSettings(): Promise<ProductSetting[]>;
   setProductHidden(slug: string, hidden: boolean, by: string): Promise<ProductSetting>;
 }
@@ -73,6 +78,7 @@ export class LocalStore implements Store {
   private uploads: string;
   private usersFile: string;
   private productsFile: string;
+  private cartsFile: string;
   private secret: Buffer;
 
   constructor(root: string) {
@@ -80,6 +86,7 @@ export class LocalStore implements Store {
     this.uploads = join(root, "uploads");
     this.usersFile = join(root, "users.json");
     this.productsFile = join(root, "products.json");
+    this.cartsFile = join(root, "carts.json");
     const secretFile = join(root, "local-secret");
     if (!existsSync(secretFile)) {
       mkdirSync(root, { recursive: true });
@@ -162,6 +169,14 @@ export class LocalStore implements Store {
     users[i] = { ...users[i], ...changes, id };
     this.write(this.usersFile, users);
     return users[i];
+  }
+
+  private carts(): Record<string, SavedCart> { return existsSync(this.cartsFile) ? JSON.parse(readFileSync(this.cartsFile, "utf8")) : {}; }
+  async getCart(userId: string) { return this.carts()[userId] ?? { items: [], wishlist: [] }; }
+  async saveCart(userId: string, cart: Partial<SavedCart>) {
+    const all = this.carts();
+    all[userId] = { ...(all[userId] ?? { items: [], wishlist: [] }), ...cart };
+    this.write(this.cartsFile, all);
   }
 
   async productSettings(): Promise<ProductSetting[]> { return existsSync(this.productsFile) ? JSON.parse(readFileSync(this.productsFile, "utf8")) : []; }
@@ -271,6 +286,17 @@ export class SupabaseStore implements Store {
     if (!UUID.test(id)) return null;
     const rows = this.ok<User[]>(await this.req("PATCH", `/rest/v1/users?id=eq.${id}`, changes, { Prefer: "return=representation" }), "Updating the account");
     return rows[0] ?? null;
+  }
+
+  async getCart(userId: string): Promise<SavedCart> {
+    if (!UUID.test(userId)) return { items: [], wishlist: [] };
+    const rows = this.ok<SavedCart[]>(await this.req("GET", `/rest/v1/carts?select=items,wishlist&user_id=eq.${userId}`), "Loading the cart");
+    return rows[0] ?? { items: [], wishlist: [] };
+  }
+  async saveCart(userId: string, cart: Partial<SavedCart>) {
+    if (!UUID.test(userId)) return;
+    this.ok(await this.req("POST", "/rest/v1/carts?on_conflict=user_id", { user_id: userId, ...cart, updated_at: new Date().toISOString() },
+      { Prefer: "resolution=merge-duplicates,return=minimal" }), "Saving the cart");
   }
 
   async productSettings() {

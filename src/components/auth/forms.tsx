@@ -44,12 +44,13 @@ export function AuthForm({ mode }: { mode: "login" | "signup" }) {
   );
 }
 
-/** On the way to checkout (?next=/checkout/): say why we're asking, and that the cart is safe. */
+/** Sent here to check out or personalise something (?next=...): say why we're asking and where they'll go back to. */
 export function CheckoutNotice() {
-  const [show, setShow] = useState(false);
-  useEffect(() => { setShow((new URLSearchParams(location.search).get("next") || "").startsWith("/checkout")); }, []);
-  if (!show) return null;
-  return <p className="auth__notice" role="status">Log in or create an account to place your order. Your cart is saved and you&apos;ll go straight back to checkout.</p>;
+  const [next, setNext] = useState("");
+  useEffect(() => { setNext(new URLSearchParams(location.search).get("next") || ""); }, []);
+  if (next.startsWith("/checkout")) return <p className="auth__notice" role="status">Log in or create an account to place your order. Your cart is saved and you&apos;ll go straight back to checkout.</p>;
+  if (next.startsWith("/products/")) return <p className="auth__notice" role="status">Log in or create an account to add photos and order. Your cart and photos are kept on your account, and you&apos;ll go straight back to the product.</p>;
+  return null;
 }
 
 /** Keeps ?next= when switching between the log-in and sign-up pages. */

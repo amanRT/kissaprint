@@ -34,3 +34,6 @@ Thumbs.db
 # Local order data (orders + customer photos from local testing) and secrets
 .data/
 .env
+
+# Reference project copied in for comparison only - never commit it
+saruskitchen-master/

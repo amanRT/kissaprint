@@ -1,5 +1,6 @@
 // Server-side pricing from catalog.json. Prices sent by the browser are never trusted.
 import { defaultIndex, productsBySlug, site } from "../catalog";
+import { cleanLayout, templateFor, type Layout } from "../magazine";
 
 export const MAX_LINES = 20;
 export const MAX_QTY = 20;
@@ -14,6 +15,8 @@ export type OrderPhoto = { key: string; name: string; size: number };
 export type PricedLine = {
   slug: string; name: string; options: [string, string][]; note: string; qty: number;
   unit_price: number; line_total: number; photos: OrderPhoto[]; photos_needed: number;
+  /** Designed products (the magazine): which photo goes in which spot - the print view is made from this. */
+  layout?: Layout;
 };
 export type Quote = { lines: PricedLine[]; subtotal: number; shipping: number; total: number };
 
@@ -57,7 +60,18 @@ export function priceLine(line: unknown, hidden: ReadonlySet<string> = new Set()
   if (!Number.isInteger(qty)) throw new CartError("Please check the quantities in your cart");
   if (qty < 1 || qty > MAX_QTY) throw new CartError(`You can order 1 to ${MAX_QTY} of each item`);
   const note = String(l.note ?? "").replace(/\s+/g, " ").trim().slice(0, 60);
-  return { slug: p.slug, name: p.name, options, note, qty, unit_price: unit, line_total: unit * qty, photos: cleanPhotos(l.photos), photos_needed: needed };
+  const photos = cleanPhotos(l.photos);
+  const priced: PricedLine = { slug: p.slug, name: p.name, options, note, qty, unit_price: unit, line_total: unit * qty, photos, photos_needed: needed };
+  if (l.layout !== undefined && l.layout !== null) {
+    const template = templateFor(p.slug, Object.fromEntries(options));
+    if (!template) throw new CartError(`${p.name}: this option can't be designed online - please choose again`);
+    try {
+      priced.layout = cleanLayout(l.layout, template, new Set(photos.map((ph) => ph.key)));
+    } catch (err) {
+      throw new CartError((err as Error).message);
+    }
+  }
+  return priced;
 }
 
 /** Price a whole cart: lines, subtotal, shipping and total (rupees, GST included). */

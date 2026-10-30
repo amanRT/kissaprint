@@ -33,7 +33,7 @@ describe("JWT sessions", () => {
 
   it("round-trips userId and isAdmin", async () => {
     const claims = await verifySession(await signSession({ ...user, is_admin: true }));
-    expect(claims).toMatchObject({ sub: user.id, isAdmin: true, email: user.email, tv: 0 });
+    expect(claims).toMatchObject({ sub: user.id, userId: user.id, isAdmin: true, email: user.email, tv: 0 });
   });
 
   it("rejects tampered, expired, foreign and unsigned tokens", async () => {
@@ -74,10 +74,12 @@ describe("proxy (route protection)", () => {
     res = await proxy(req("/checkout/"));
     expect(new URL(res.headers.get("location")!).pathname + new URL(res.headers.get("location")!).search).toBe("/login/?next=%2Fcheckout%2F");
     expect((await proxy(req("/api/orders/"))).status).toBe(401);
+    expect((await proxy(req("/api/cart/"))).headers.get("x-middleware-next")).toBe("1"); // reading the cart answers {signedIn: false}
+    expect((await proxy(new NextRequest("http://localhost/api/cart/", { method: "PUT" }))).status).toBe(401); // saving needs an account
 
     const customer = await signSession(user);
     res = await proxy(req("/admin/", customer));
-    expect(res.headers.get("location")).toBe("http://localhost/account/?denied=1");
+    expect(res.headers.get("location")).toBe("http://localhost/"); // customers go back to the homepage
     expect((await proxy(req("/api/admin/orders/", customer))).status).toBe(403);
     expect((await proxy(req("/account/", customer))).headers.get("x-middleware-next")).toBe("1");
     expect((await proxy(req("/checkout/", customer))).headers.get("x-middleware-next")).toBe("1");
@@ -87,7 +89,15 @@ describe("proxy (route protection)", () => {
     expect((await proxy(req("/admin/", admin))).headers.get("x-middleware-next")).toBe("1");
     expect((await proxy(req("/api/admin/orders/", admin))).headers.get("x-middleware-next")).toBe("1");
     expect((await proxy(req("/login/?next=/admin/", admin))).headers.get("location")).toBe("http://localhost/admin/");
-    expect((await proxy(req("/admin/", admin + "x"))).status).toBe(307); // broken signature = signed out
+    const broken = await proxy(req("/admin/", admin + "x")); // broken signature = signed out
+    expect(broken.status).toBe(307);
+    expect(broken.headers.get("set-cookie")).toMatch(/kp_session=;.*Max-Age=0/i); // ...and the bad cookie is removed
+    expect(new URL(broken.headers.get("location")!).pathname).toBe("/login/");
+    expect((await proxy(req("/admin/"))).headers.get("set-cookie")).toBeNull(); // nothing to remove when there's no cookie
+    for (const path of ["/api/quote/", "/api/verify/", "/api/orders/", "/api/uploads/"]) {
+      const r = await proxy(new NextRequest(`http://localhost${path}`, { method: "POST", headers: { cookie: "kp_session=garbage" } }));
+      expect([r.status, /Max-Age=0/i.test(r.headers.get("set-cookie") ?? "")], path).toEqual([401, true]); // checkout APIs need a valid login
+    }
   });
 });
 

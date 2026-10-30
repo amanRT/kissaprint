@@ -8,7 +8,7 @@ export default function LoginPage() {
     <div className="wrap auth">
       <div className="co-card auth__card">
         <h1>Log in</h1>
-        <p className="muted">Log in to place orders and see their status. The team uses this to open the order dashboard too.</p>
+        <p className="muted">Log in to order, follow your orders and see the gifts you've saved.</p>
         <CheckoutNotice />
         <AuthForm mode="login" />
         <p className="auth__alt">New to KissaPrints? <SwitchLink href="/signup/">Create an account</SwitchLink></p>

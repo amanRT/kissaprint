@@ -12,6 +12,7 @@ import { GET as orderView } from "@/app/api/order/route";
 import { POST as createOrder } from "@/app/api/orders/route";
 import { POST as quoteRoute } from "@/app/api/quote/route";
 import { POST as webhook } from "@/app/api/razorpay-webhook/route";
+import { GET as getCart, PUT as putCart } from "@/app/api/cart/route";
 import { POST as track } from "@/app/api/track/route";
 import { PUT as uploadLocal } from "@/app/api/upload-local/route";
 import { POST as uploads } from "@/app/api/uploads/route";
@@ -20,7 +21,7 @@ import { occasions, site } from "@/lib/catalog";
 import { collectionListing, shopListing } from "@/lib/collections";
 import { visibilityFrom } from "@/lib/visible";
 import { settings } from "@/lib/server/config";
-import { cleanAddress, cleanContact, FieldError, isTest, newOrderId, normalisePhone, ORDER_ID } from "@/lib/server/orders";
+import { cleanAddress, cleanContact, FieldError, isTest, newOrderId, normalisePhone, ORDER_ID, wasPaid } from "@/lib/server/orders";
 import { hashPassword } from "@/lib/server/passwords";
 import { Razorpay } from "@/lib/server/payments";
 import { CartError, PHOTO_KEY, priceLine, quote, shippingFor } from "@/lib/server/pricing";
@@ -57,6 +58,30 @@ describe("pricing", () => {
     expect(shippingFor(site.free_shipping_over)).toBe(0);
     const q = quote([{ slug: "boarding-pass-card", qty: 1 }]);
     expect(q.total).toBe(q.subtotal + site.shipping_fee);
+  });
+});
+
+describe("magazine designs", () => {
+  const key = (c: string) => `up/20261030/${c.repeat(32)}.jpg`;
+  const line = (layout: unknown, pages = "8 pages", photos = [key("a"), key("b")]) =>
+    ({ slug: "personalised-magazine", opts: { Pages: pages }, photos: photos.map((k) => ({ key: k, name: "p.jpg", size: 1 })), layout });
+
+  it("keeps which photo goes in which spot, with its framing clamped to 0-100", () => {
+    const priced = priceLine(line({ template: "kissa-8", slots: { cover: { key: key("a"), x: 120, y: 33.333 }, back: { key: key("b"), x: 10 } } }));
+    expect(priced.layout).toEqual({ template: "kissa-8", slots: { cover: { key: key("a"), x: 100, y: 33.3 }, back: { key: key("b"), x: 10, y: 50 } } });
+    expect(priceLine(line(undefined)).layout).toBeUndefined(); // the old "send photos" way still works
+  });
+
+  it("refuses designs that don't add up", () => {
+    for (const [bad, pages] of [
+      [{ template: "kissa-8", slots: { cover: { key: key("c") } } }, "8 pages"], // a photo that isn't in this line
+      [{ template: "kissa-8", slots: { nope: { key: key("a") } } }, "8 pages"], // no such spot
+      [{ template: "other", slots: {} }, "8 pages"], // wrong template
+      [{ template: "kissa-8", slots: {} }, "16 pages"], // that option can't be designed
+      ["junk", "8 pages"],
+    ] as const) {
+      expect(() => priceLine(line(bad, pages)), JSON.stringify(bad)).toThrow(CartError);
+    }
   });
 });
 
@@ -104,15 +129,16 @@ async function adminCookie() {
 describe("order flow", () => {
   useTestEnv();
   const place = async (items: unknown[] = [{ slug: "classic-memoroids", qty: 2, opts: { "Pack size": "30 prints" }, note: "us, always", photos: [PHOTO] }], customer = CUSTOMER) => {
-    const res = await call(createOrder, "POST", "/api/orders/", { cookie: await shopperCookie(), body: { items, customer, address: ADDRESS } });
+    const cookie = await shopperCookie();
+    const res = await call(createOrder, "POST", "/api/orders/", { cookie, body: { items, customer, address: ADDRESS } });
     expect(res.status, JSON.stringify(res.data)).toBe(201);
-    return res.data;
+    return { ...res.data, cookie }; // the same shopper confirms the payment
   };
 
   it("quotes on the server", async () => {
-    const res = await call(quoteRoute, "POST", "/api/quote/", { body: { items: [{ slug: "song-plaque", qty: 1 }] } });
+    const res = await call(quoteRoute, "POST", "/api/quote/", { cookie: await shopperCookie(), body: { items: [{ slug: "song-plaque", qty: 1 }] } });
     expect([res.data.subtotal, res.data.shipping, res.data.payments]).toEqual([549, 79, "mock"]);
-    expect((await call(quoteRoute, "POST", "/api/quote/", { body: { items: [] } })).status).toBe(400);
+    expect((await call(quoteRoute, "POST", "/api/quote/", { cookie: await shopperCookie(), body: { items: [] } })).status).toBe(400);
   });
 
   it("checks out, pays, and gets fulfilled through the admin", async () => {
@@ -122,8 +148,10 @@ describe("order flow", () => {
     expect(placed.payment.amount).toBe(119800);
     expect(placed.payment.prefill.contact).toBe("+919876543210");
 
-    expect((await call(verify, "POST", "/api/verify/", { body: { ...placed.payment.mock, razorpay_signature: "0".repeat(64), id } })).status).toBe(400);
-    for (let i = 0; i < 2; i++) expect((await call(verify, "POST", "/api/verify/", { body: { ...placed.payment.mock, id } })).data.status).toBe("paid");
+    expect((await call(verify, "POST", "/api/verify/", { cookie: placed.cookie, body: { ...placed.payment.mock, razorpay_signature: "0".repeat(64), id } })).status).toBe(400);
+    for (let i = 0; i < 2; i++) expect((await call(verify, "POST", "/api/verify/", { cookie: placed.cookie, body: { ...placed.payment.mock, id } })).data.status).toBe("paid");
+    expect((await call(verify, "POST", "/api/verify/", { cookie: await shopperCookie(), body: { ...placed.payment.mock, id } })).status).toBe(404); // not your order
+    expect((await call(verify, "POST", "/api/verify/", { body: { ...placed.payment.mock, id } })).status).toBe(401);
 
     expect((await call(orderView, "GET", `/api/order/?id=${id}&t=wrong`)).status).toBe(404);
     const view = await call(orderView, "GET", `/api/order/?id=${id}&t=${token}`);
@@ -186,14 +214,14 @@ describe("order flow", () => {
   });
 
   it("issues signed local upload links and refuses non-photos", async () => {
-    const res = await call(uploads, "POST", "/api/uploads/", { body: { slug: "classic-memoroids", files: [{ name: "a.jpg", type: "image/jpeg", size: 10 }] } });
+    const res = await call(uploads, "POST", "/api/uploads/", { cookie: await shopperCookie(), body: { slug: "classic-memoroids", files: [{ name: "a.jpg", type: "image/jpeg", size: 10 }] } });
     const target = res.data.uploads[0];
     expect(PHOTO_KEY.test(target.key)).toBe(true);
     const qs = target.url.split("?")[1];
     expect((await call(uploadLocal, "PUT", `/api/upload-local/?${qs.replace("sig=", "sig=0")}`, { raw: "x" })).status).toBe(403);
     expect((await call(uploadLocal, "PUT", `/api/upload-local/?${qs}`, { raw: "jpegbytes" })).status).toBe(200);
-    expect((await call(uploads, "POST", "/api/uploads/", { body: { slug: "classic-memoroids", files: [{ name: "a.exe", type: "application/x-msdownload" }] } })).status).toBe(400);
-    expect((await call(uploads, "POST", "/api/uploads/", { body: { slug: "classic-memoroids", files: [{ name: "big.jpg", type: "image/jpeg", size: 30 * 2 ** 20 }] } })).status).toBe(400);
+    expect((await call(uploads, "POST", "/api/uploads/", { cookie: await shopperCookie(), body: { slug: "classic-memoroids", files: [{ name: "a.exe", type: "application/x-msdownload" }] } })).status).toBe(400);
+    expect((await call(uploads, "POST", "/api/uploads/", { cookie: await shopperCookie(), body: { slug: "classic-memoroids", files: [{ name: "big.jpg", type: "image/jpeg", size: 30 * 2 ** 20 }] } })).status).toBe(400);
   });
 
   it("only accepts JSON", async () => {
@@ -220,11 +248,11 @@ describe("product visibility (/admin/products/)", () => {
     expect(revalidateTag).toHaveBeenCalledWith("products", { expire: 0 }); // pages re-render on their next visit
     expect(revalidatePath).toHaveBeenCalledWith("/", "layout");
 
-    const q = await call(quoteRoute, "POST", "/api/quote/", { body: { items: [{ slug: "song-plaque" }, { slug: "star-map" }] } });
+    const q = await call(quoteRoute, "POST", "/api/quote/", { cookie: shopper, body: { items: [{ slug: "song-plaque" }, { slug: "star-map" }] } });
     expect([q.status, q.data.error]).toEqual([400, "Song Glass Plaque is currently unavailable - please remove it from your cart"]);
     expect((await order(shopper)).status).toBe(400);
-    expect((await call(uploads, "POST", "/api/uploads/", { body: { slug: "song-plaque", files: [{ name: "a.jpg", type: "image/jpeg", size: 10 }] } })).status).toBe(400);
-    expect((await call(quoteRoute, "POST", "/api/quote/", { body: { items: [{ slug: "star-map" }] } })).status).toBe(200); // others unaffected
+    expect((await call(uploads, "POST", "/api/uploads/", { cookie: await shopperCookie(), body: { slug: "song-plaque", files: [{ name: "a.jpg", type: "image/jpeg", size: 10 }] } })).status).toBe(400);
+    expect((await call(quoteRoute, "POST", "/api/quote/", { cookie: shopper, body: { items: [{ slug: "star-map" }] } })).status).toBe(200); // others unaffected
 
     await call(setProduct, "POST", "/api/admin/products/", { cookie, body: { slug: "song-plaque", hidden: false } });
     expect((await order(shopper)).status).toBe(201);
@@ -262,6 +290,57 @@ describe("what the shop shows when products are switched off", () => {
     const none = visibilityFrom(new Set(couples));
     expect(none.url("/gifts/for-couples/")).toBe(false);
     expect(none.groups(occasions).map((o) => o.slug)).not.toContain("for-couples");
+  });
+});
+
+describe("cart on the account (nothing in localStorage)", () => {
+  useTestEnv();
+  const line = { id: "l1", slug: "classic-memoroids", name: "x".repeat(500), image: "/assets/img/a.webp", price: 1, qty: 2, options: "30 prints · Matte",
+    opts: { "Pack size": "30 prints" }, note: "us, always", need: 30, photos: [PHOTO] };
+
+  it("needs a log-in, keeps the cart and wishlist per account, and checks every line like checkout does", async () => {
+    expect((await call(getCart, "GET", "/api/cart/")).data).toEqual({ signedIn: false, items: [], wishlist: [], prefill: null }); // no 401 noise
+    expect((await call(putCart, "PUT", "/api/cart/", { body: { items: [] } })).status).toBe(401);
+    expect((await call(uploads, "POST", "/api/uploads/", { body: { slug: "classic-memoroids", files: [{ name: "a.jpg", type: "image/jpeg", size: 1 }] } })).status).toBe(401);
+
+    const cookie = await shopperCookie();
+    expect((await call(getCart, "GET", "/api/cart/", { cookie })).data).toEqual({ signedIn: true, items: [], wishlist: [], prefill: null });
+    expect((await call(putCart, "PUT", "/api/cart/", { cookie, body: { items: [line], wishlist: ["song-plaque", "song-plaque", "nope"] } })).status).toBe(200);
+    const saved = (await call(getCart, "GET", "/api/cart/", { cookie })).data;
+    expect(saved.wishlist).toEqual(["song-plaque"]);
+    expect(saved.items[0]).toMatchObject({ slug: "classic-memoroids", qty: 2, price: 599, need: 30, opts: { "Pack size": "30 prints", Finish: "Matte" } }); // priced by the server
+    expect(saved.items[0].name).toBe("Classic Memoroids");
+    expect((await call(getCart, "GET", "/api/cart/", { cookie: await shopperCookie() })).data.items).toEqual([]); // someone else's account
+
+    for (const bad of [{ ...line, slug: "nope" }, { ...line, qty: 99 }, { ...line, photos: [{ key: "../x" }] }, "junk"]) {
+      expect((await call(putCart, "PUT", "/api/cart/", { cookie, body: { items: [bad] } })).status, JSON.stringify(bad)).toBe(400);
+    }
+    const withQuote = (await call(getCart, "GET", "/api/cart/?quote=1", { cookie })).data; // checkout: cart + price in one trip
+    expect([withQuote.quote.subtotal, withQuote.quote.shipping, withQuote.quote.total]).toEqual([1198, 0, 1198]);
+    await makeStore(settings())!.setProductHidden("classic-memoroids", true, "Boss");
+    expect((await call(getCart, "GET", "/api/cart/?quote=1", { cookie })).data.quote_error).toBe("Classic Memoroids is currently unavailable - please remove it from your cart");
+    await makeStore(settings())!.setProductHidden("classic-memoroids", false, "Boss");
+    await call(putCart, "PUT", "/api/cart/", { cookie, body: { wishlist: [] } }); // only the wishlist changes
+    const email = (await call((await import("@/app/api/auth/me/route")).GET, "GET", "/api/auth/me/", { cookie })).data.user.email;
+    const second = await call(login, "POST", "/api/auth/login/", { body: { email, password: "shopper-pass-1" } }); // log in on another device
+    expect(second.status).toBe(200);
+    const otherDevice = sessionFrom(second.headers);
+    expect((await call(getCart, "GET", "/api/cart/", { cookie: otherDevice })).data.items.map((i: { slug: string }) => i.slug)).toEqual(["classic-memoroids"]); // same cart on another device
+    expect((await call(getCart, "GET", "/api/cart/", { cookie })).data.items).toHaveLength(1);
+
+    await call(createOrder, "POST", "/api/orders/", { cookie, body: { items: [{ slug: "song-plaque" }], customer: CUSTOMER, address: ADDRESS } });
+    expect((await call(getCart, "GET", "/api/cart/", { cookie })).data.prefill).toEqual({ phone: "9876543210", address: cleanAddress(ADDRESS) }); // checkout fills these in
+  });
+});
+
+describe("orders the customer sees", () => {
+  it("leaves out checkouts that were opened and cancelled", () => {
+    const h = (...statuses: string[]) => ({ history: statuses.map((status) => ({ at: "t", status })) }) as Parameters<typeof wasPaid>[0];
+    expect(wasPaid(h("pending"))).toBe(false); // clicked Pay, closed the payment window
+    expect(wasPaid(h("pending", "cancelled"))).toBe(false); // the team tidied up an unpaid attempt
+    expect(wasPaid(h("pending", "paid"))).toBe(true);
+    expect(wasPaid(h("pending", "paid", "shipped", "refunded"))).toBe(true);
+    expect(wasPaid(h("paid"))).toBe(true); // team test account (payment skipped)
   });
 });
 

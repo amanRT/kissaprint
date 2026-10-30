@@ -18,11 +18,12 @@ export async function currentUser(): Promise<Viewer> {
 }
 
 /** For /admin/* pages: the admin, or a redirect (log in again / not for customers). proxy.ts checked the JWT first;
- *  this re-reads is_admin from the database on every request, so revoking admin rights takes effect immediately. */
+ *  this re-reads is_admin from the database on every request, so revoking admin rights takes effect immediately.
+ *  A signed-in customer is sent to the homepage. */
 export async function requireAdminPage(path: string): Promise<User> {
   const viewer = await currentUser();
   if (viewer.state === "expired") redirect(`/login/?expired=1&next=${encodeURIComponent(path)}`);
   if (viewer.state !== "signed-in") redirect(`/login/?next=${encodeURIComponent(path)}`);
-  if (!viewer.user.is_admin) redirect("/account/?denied=1");
+  if (!viewer.user.is_admin) redirect("/"); // customers go back to the shop, like proxy.ts does
   return viewer.user;
 }

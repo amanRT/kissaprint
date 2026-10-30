@@ -8,7 +8,7 @@ import { inr, phoneDisplay, when } from "@/lib/format";
 import { AdminNav } from "./nav";
 
 type Summary = { id: string; created_at: string; status: string; name: string; phone: string; city: string; state: string; total: number; items: string[]; photos: number; photos_needed: number; gateway: string; test: boolean };
-type Line = { slug: string; name: string; options: [string, string][]; note: string; qty: number; line_total: number; photos: { key: string; name: string; size: number }[]; photos_needed: number };
+type Line = { slug: string; name: string; options: [string, string][]; note: string; qty: number; line_total: number; layout?: { template: string; slots: Record<string, unknown> }; photos: { key: string; name: string; size: number }[]; photos_needed: number };
 type Order = {
   id: string; created_at: string; status: string; gateway: string; token: string; total: number; subtotal: number; shipping: number;
   customer: { name: string; phone: string; email: string }; address: { line1: string; line2: string; city: string; state: string; pincode: string };
@@ -347,6 +347,10 @@ function OrderDetail({ order: o, photos, say, onSaved, onDeleted, signedOut }: {
             <div className="adm-item__head"><strong>{it.name} × {it.qty}</strong><span>{inr(it.line_total)}</span></div>
             <p>{it.options.map(([k, v], n) => <span key={k}>{n > 0 && " · "}{k}: <strong>{v}</strong></span>)}</p>
             {it.note && <p>Caption: <strong>“{it.note}”</strong></p>}
+            {it.layout && (
+              <p className="adm-ok">Designed online: {Object.keys(it.layout.slots).length} photo spots filled ·{" "}
+                <a href={`/admin/print/${encodeURIComponent(o.id)}/?line=${i}`} target="_blank" rel="noopener" data-print-link>Open print view (A4 PDF) ↗</a></p>
+            )}
             {(it.photos_needed > 0 || it.photos.length > 0) && (
               <p className={it.photos.length < it.photos_needed ? "adm-warn" : "adm-ok"}>{it.photos.length}{it.photos_needed ? ` of ${it.photos_needed}` : ""} photos uploaded{it.photos.length < it.photos_needed ? " - ask the customer for the rest" : ""}</p>
             )}

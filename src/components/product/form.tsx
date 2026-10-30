@@ -1,10 +1,16 @@
 "use client";
 // Product options, price, photo uploads (straight to storage via one-time links), caption, quantity, add to cart,
 // delivery estimate and the sticky mobile buy bar. Port of the original main.js product-page logic.
+import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { api, type ApiError } from "@/lib/client-api";
 import { inr } from "@/lib/format";
+import { templateFor, type Layout } from "@/lib/magazine";
+import type { Design } from "../magazine/editor";
 import { useShop } from "../shop/provider";
+
+// The magazine designer only downloads when someone opens it (it isn't needed on any other product page).
+const MagazineEditor = dynamic(() => import("../magazine/editor").then((m) => m.MagazineEditor), { ssr: false });
 
 export type FormProduct = {
   slug: string; name: string; price: number; photos: number; image: string;
@@ -18,7 +24,10 @@ const MAX_BYTES = 25 * 1024 * 1024;
 const isPhoto = (f: File) => (f.type.startsWith("image/") || /\.(heic|heif)$/i.test(f.name)) && f.size <= MAX_BYTES;
 
 export function ProductForm({ p, icons, perks }: { p: FormProduct; icons: Record<"upload" | "minus" | "plus" | "pin", React.ReactNode>; perks: React.ReactNode }) {
-  const { addToCart, say } = useShop();
+  const { addToCart, say, account } = useShop();
+  // Personalising and ordering need an account (the cart and photos are kept on it), so signed-out visitors log in first.
+  const signedOut = account === "out";
+  const loginHref = `/login/?next=${encodeURIComponent(`/products/${p.slug}/#personalise`)}`; // back at the form, not the top
   const [choice, setChoice] = useState(p.options.map((o) => o.default));
   const [qty, setQty] = useState(1);
   const [note, setNote] = useState("");
@@ -27,6 +36,8 @@ export function ProductForm({ p, icons, perks }: { p: FormProduct; icons: Record
   const [pin, setPin] = useState("");
   const [pinOut, setPinOut] = useState<{ ok: boolean; text: string } | null>(null);
   const [stickyVisible, setStickyVisible] = useState(false);
+  const [design, setDesign] = useState<Design>({});
+  const [designing, setDesigning] = useState(false);
   const photosRef = useRef<Photo[]>([]);
   const xhrs = useRef(new Map<string, XMLHttpRequest>());
   const chain = useRef<Promise<void>>(Promise.resolve());
@@ -36,6 +47,9 @@ export function ProductForm({ p, icons, perks }: { p: FormProduct; icons: Record
   const chosen = p.options.map((o, i) => o.values[choice[i]]);
   const unit = chosen.reduce((price, v) => v.price ?? price, p.price);
   const need = chosen.reduce((n, v) => v.photos ?? n, p.photos);
+  const opts = Object.fromEntries(p.options.map((o, i) => [o.name, o.values[choice[i]].label]));
+  const template = templateFor(p.slug, opts); // e.g. the 8-page magazine: designed spot by spot instead of a photo pile
+  const placed = template ? template.slots.filter((s) => design[s.id] && photos.some((x) => x.id === design[s.id].photoId)).length : 0;
   const count = (s: Photo["state"]) => photos.filter((x) => x.state === s).length;
 
   const update = (fn: (list: Photo[]) => Photo[]) => { photosRef.current = fn(photosRef.current); setPhotosState(photosRef.current); };
@@ -81,6 +95,17 @@ export function ProductForm({ p, icons, perks }: { p: FormProduct; icons: Record
     }));
     update((list) => [...list, ...fresh]);
     for (let i = 0; i < fresh.length; i += 20) upload(fresh.slice(i, i + 20));
+    return fresh;
+  };
+  const retryPhoto = (photo: Photo) => { patch(photo.id, { state: "up", pct: 0 }); upload([photo]); };
+  const openDesigner = () => {
+    if (template) { // photos added before (e.g. on another option) go into the empty spots first
+      const used = new Set(Object.values(design).map((d) => d.photoId));
+      const spare = photosRef.current.filter((x) => !used.has(x.id));
+      const empty = template.slots.filter((s) => !design[s.id] || !photosRef.current.some((x) => x.id === design[s.id].photoId));
+      if (spare.length && empty.length) setDesign((d) => ({ ...d, ...Object.fromEntries(empty.slice(0, spare.length).map((s, i) => [s.id, { photoId: spare[i].id, x: 50, y: 50 }])) }));
+    }
+    setDesigning(true);
   };
   const removePhoto = (photo: Photo) => {
     update((list) => list.filter((x) => x.id !== photo.id));
@@ -105,16 +130,28 @@ export function ProductForm({ p, icons, perks }: { p: FormProduct; icons: Record
       for (let i = 0; i < 100 && photosRef.current.some((x) => x.state === "up"); i++) await chain.current;
       setWaiting(false);
     }
-    const opts = Object.fromEntries(p.options.map((o, i) => [o.name, o.values[choice[i]].label]));
     const labels = Object.values(opts);
     const caption = note.trim().slice(0, 60);
     if (caption) labels.push(`“${caption}”`);
+    const done = photosRef.current.filter((x) => x.state === "done" && x.key);
+    let layout: Layout | undefined;
+    if (template) { // which uploaded photo sits in which spot, and its framing - the print view is made from this
+      const slots: Layout["slots"] = {};
+      for (const s of template.slots) {
+        const d = design[s.id];
+        const ph = d && done.find((x) => x.id === d.photoId);
+        if (d && ph) slots[s.id] = { key: ph.key!, x: Math.round(d.x * 10) / 10, y: Math.round(d.y * 10) / 10 };
+      }
+      if (Object.keys(slots).length) layout = { template: template.id, slots };
+    }
+    const keep = layout ? new Set(Object.values(layout.slots).map((x) => x.key)) : null;
     addToCart({
       slug: p.slug, name: p.name, image: p.image, price: unit, qty, options: labels.join(" · "), opts, note: caption, need,
-      photos: photosRef.current.filter((x) => x.state === "done" && x.key).map((x) => ({ key: x.key!, name: x.name, size: x.size })),
+      photos: done.filter((x) => !keep || keep.has(x.key!)).map((x) => ({ key: x.key!, name: x.name, size: x.size })), layout,
     });
     photosRef.current.forEach((x) => URL.revokeObjectURL(x.url)); // those photos now belong to that cart line
     update(() => []);
+    setDesign({});
   };
 
   const checkPin = () => {
@@ -125,7 +162,8 @@ export function ProductForm({ p, icons, perks }: { p: FormProduct; icons: Record
   };
 
   const status = [
-    photos.length ? (need ? `${photos.length} of ${need} photos added` : `${photos.length} photo${photos.length === 1 ? "" : "s"} added`) : "",
+    template ? (placed ? `${placed} of ${template.slots.length} photo spots filled` : "")
+      : photos.length ? (need ? `${photos.length} of ${need} photos added` : `${photos.length} photo${photos.length === 1 ? "" : "s"} added`) : "",
     count("up") ? `uploading ${count("up")}…` : "",
     count("err") ? `${count("err")} didn't upload - tap ↻ to retry` : "",
     count("off") ? "photo upload is paused right now, so please send them after you order" : "",
@@ -134,7 +172,7 @@ export function ProductForm({ p, icons, perks }: { p: FormProduct; icons: Record
 
   return (
     <>
-      <form ref={form} className="pdp__form" data-pdp data-slug={p.slug} onSubmit={submit}>
+      <form ref={form} id="personalise" className="pdp__form" data-pdp data-slug={p.slug} onSubmit={submit}>
         {p.options.map((opt, oi) => (
           <fieldset className="opt" key={opt.name} data-opt-name={opt.name}>
             <legend>{opt.name}: <output>{opt.values[choice[oi]].label}</output></legend>
@@ -150,20 +188,46 @@ export function ProductForm({ p, icons, perks }: { p: FormProduct; icons: Record
           </fieldset>
         ))}
 
-        {p.photos > 0 && (
+        {template && (
+          <div className="designer-card">
+            <span className="field-label">Your magazine <span>({template.pages} pages, {template.slots.length} photo spots - fill them now or send photos after you order)</span></span>
+            <div className="designer-card__body">
+              <div>
+                <strong>Design it page by page</strong>
+                <span>Put your photos exactly where you want them, frame each one, and flip through every page before you order.</span>
+              </div>
+              {signedOut ? <a className="btn btn--kiss" href={loginHref} data-login-to-design>Log in to start designing</a>
+                : <button type="button" className="btn btn--kiss" onClick={openDesigner} data-open-designer>{placed ? "Edit your design" : "Start designing"}</button>}
+            </div>
+            <p className="photo-status" data-photo-status aria-live="polite">{status}</p>
+          </div>
+        )}
+        {designing && template && (
+          <MagazineEditor template={template} title={note} photos={photos} design={design} setDesign={setDesign}
+            addPhotos={addPhotos} removePhoto={(id) => { const ph = photosRef.current.find((x) => x.id === id); if (ph) removePhoto(ph); }}
+            retryPhoto={(id) => { const ph = photosRef.current.find((x) => x.id === id); if (ph) retryPhoto(ph); }} onClose={() => setDesigning(false)} />
+        )}
+
+        {p.photos > 0 && !template && (
           <div>
             <span className="field-label">Your photos <span>(<span data-need-out>{need}</span> needed - add them now or send them after you order)</span></span>
-            <label className="dropzone" data-dropzone>
-              {icons.upload}<strong>{photos.length ? "Add more photos" : "Tap to add photos"}</strong><span>JPG, PNG or HEIC, up to 25 MB each</span>
-              <input type="file" accept="image/*" multiple aria-label="Add your photos" data-photo-input
-                onChange={(e) => { addPhotos([...(e.target.files ?? [])]); e.target.value = ""; }} />
-            </label>
+            {signedOut ? (
+              <a className="dropzone" href={loginHref} data-login-to-upload>
+                {icons.upload}<strong>Log in to add your photos</strong><span>Your photos and cart are kept safely on your account</span>
+              </a>
+            ) : (
+              <label className="dropzone" data-dropzone>
+                {icons.upload}<strong>{photos.length ? "Add more photos" : "Tap to add photos"}</strong><span>JPG, PNG or HEIC, up to 25 MB each</span>
+                <input type="file" accept="image/*" multiple aria-label="Add your photos" data-photo-input
+                  onChange={(e) => { addPhotos([...(e.target.files ?? [])]); e.target.value = ""; }} />
+              </label>
+            )}
             <div className="previews" data-previews>
               {photos.map((x) => (
                 <div key={x.id} className={x.noprev ? "thumb is-noprev" : "thumb"} data-state={x.state} style={{ "--pct": `${x.pct}%` } as React.CSSProperties}>
                   <img alt="" src={x.url} onError={() => patch(x.id, { noprev: true })} />
                   <button type="button" className="thumb__x" aria-label={`Remove ${x.name}`} onClick={() => removePhoto(x)}>×</button>
-                  <button type="button" className="thumb__retry" aria-label={`Retry uploading ${x.name}`} onClick={() => { patch(x.id, { state: "up", pct: 0 }); upload([x]); }}>↻</button>
+                  <button type="button" className="thumb__retry" aria-label={`Retry uploading ${x.name}`} onClick={() => retryPhoto(x)}>↻</button>
                 </div>
               ))}
             </div>
@@ -172,8 +236,8 @@ export function ProductForm({ p, icons, perks }: { p: FormProduct; icons: Record
         )}
 
         <div>
-          <label className="field-label" htmlFor="note">Caption or message <span>(optional)</span></label>
-          <input className="input" id="note" name="note" maxLength={60} placeholder="e.g. us, always" autoComplete="off" value={note} onChange={(e) => setNote(e.target.value)} />
+          <label className="field-label" htmlFor="note">{template ? <>Title for the cover <span>(optional - e.g. your names)</span></> : <>Caption or message <span>(optional)</span></>}</label>
+          <input className="input" id="note" name="note" maxLength={template ? 40 : 60} placeholder={template ? "e.g. Aarav & Meera" : "e.g. us, always"} autoComplete="off" value={note} onChange={(e) => setNote(e.target.value)} />
         </div>
 
         <div className="buy-row">
@@ -183,9 +247,11 @@ export function ProductForm({ p, icons, perks }: { p: FormProduct; icons: Record
               onChange={(e) => setQty(Math.min(20, Math.max(1, Number(e.target.value) || 1)))} />
             <button type="button" aria-label="Increase quantity" data-step="1" onClick={() => setQty(Math.min(20, qty + 1))}>{icons.plus}</button>
           </div>
-          <button ref={addBtn} className="btn btn--kiss" type="submit" data-add disabled={waiting}>
-            {waiting ? "Uploading your photos…" : <>Add to cart · <span data-price-out>{total}</span></>}
-          </button>
+          {signedOut ? <a className="btn btn--kiss" href={loginHref} data-login-to-buy>Log in to order</a> : (
+            <button ref={addBtn} className="btn btn--kiss" type="submit" data-add disabled={waiting}>
+              {waiting ? "Uploading your photos…" : <>Add to cart · <span data-price-out>{total}</span></>}
+            </button>
+          )}
         </div>
 
         <div className="delivery">
@@ -203,7 +269,8 @@ export function ProductForm({ p, icons, perks }: { p: FormProduct; icons: Record
 
       <div className={stickyVisible ? "sticky-buy is-visible" : "sticky-buy"} data-sticky-buy inert={!stickyVisible}>
         <div className="sticky-buy__info"><strong>{p.name}</strong><span data-price-out>{total}</span></div>
-        <button className="btn btn--kiss btn--sm" type="button" data-sticky-add onClick={() => form.current?.requestSubmit()}>Add to cart</button>
+        {signedOut ? <a className="btn btn--kiss btn--sm" href={loginHref}>Log in to order</a>
+          : <button className="btn btn--kiss btn--sm" type="button" data-sticky-add onClick={() => form.current?.requestSubmit()}>Add to cart</button>}
       </div>
     </>
   );

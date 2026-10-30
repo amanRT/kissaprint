@@ -60,7 +60,7 @@ export default async function ProductPage({ params }: Props) {
       <JsonLd data={[ldProduct(p, !unavailable), ldBreadcrumbs(crumbs)]} />
       <div className="wrap">
         <div className="pdp">
-          <Gallery images={gallery} sizes={SIZES} badges={<Badges p={p} />} />
+          <Gallery images={gallery} sizes={SIZES} badges={<Badges p={p} />} transitionName={`p-${p.slug}`} />
           <div className="pdp__info">
             <Breadcrumbs items={crumbs} />
             <h1>{p.name}</h1>

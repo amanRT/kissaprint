@@ -99,17 +99,19 @@ Anyone can browse, fill a cart and upload photos, but **ordering needs an accoun
 
 | Claim | Meaning |
 |---|---|
-| `sub` | user ID (`users.id`) |
+| `userId` (and the standard `sub`) | user ID (`users.id`) |
 | `isAdmin` | the user's `users.is_admin` at log-in |
 | `email`, `name` | for display |
 | `tv` | the user's `token_version`, so sessions can be revoked |
 | `iss`, `aud`, `iat`, `exp` | issuer, audience, issued-at and expiry, all checked |
 
+**One cookie, nothing in localStorage.** `kp_session` is the only cookie the site sets. Nothing about the shopper is kept in the browser: the cart and wishlist are saved to the account (`carts` table, `/api/cart/`), and checkout fills in name and email from the account and the phone and address from the last order. Shoppers log in before adding photos or adding to cart, and come straight back to the product afterwards. Photo uploads need an account too.
+
 **On every request:**
 
-1. `src/proxy.ts` verifies the token for `/admin/*`, `/api/admin/*`, `/account/*`, `/checkout/*` and `/api/orders/*`.
+1. `src/proxy.ts` (the middleware; Next.js 16 renamed `middleware.ts` to `proxy.ts`) verifies the token for `/admin/*`, `/api/admin/*`, `/account/*`, `/checkout/*` and the checkout APIs (`/api/orders`, `/api/quote`, `/api/verify`, `/api/cart` writes, `/api/uploads`). A missing or invalid token is removed and the visitor is sent to log in.
    - No valid token: pages redirect to `/login/?next=…`, APIs answer 401.
-   - A valid token without `isAdmin`: `/admin/` redirects to `/account/?denied=1`, admin APIs answer 403.
+   - A valid token without `isAdmin`: `/admin/` redirects to the homepage, admin APIs answer 403.
 2. The `/admin/` page and every admin API then re-check the database: the user must still exist, `is_admin` must still be true and `token_version` must match. Demoting an admin or "log out everywhere" therefore takes effect immediately, even for tokens that haven't expired.
 
 **Admins:** sign-up always creates a customer (`is_admin = false`). To make an admin:
@@ -157,7 +159,7 @@ On Vercel a missing setting switches that feature off with a clear message, for 
 
 1. **Supabase** (free plan to start):
    - Create a project.
-   - In **SQL Editor**, paste `supabase/schema.sql` and run it. This creates the `users`, `orders` and `product_settings` tables and the private `order-photos` bucket. It's safe to run again, and you need to after updates (this version adds `users`, `orders.user_id` and `product_settings`). Deploys read `product_settings` while building, so run it before deploying.
+   - In **SQL Editor**, paste `supabase/schema.sql` and run it. This creates the `users`, `orders`, `carts` and `product_settings` tables and the private `order-photos` bucket. It's safe to run again, and you need to after updates (this version adds `users`, `orders.user_id`, `users.is_tester`, `carts` and `product_settings`). Deploys read `product_settings` while building, so run it before deploying.
    - From **Project Settings → API Keys**, copy the project URL and a **secret** key (`sb_secret_…`, or the legacy `service_role` key).
 2. **Razorpay:**
    - Sign up and switch to **Test mode**.

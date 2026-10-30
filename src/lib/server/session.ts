@@ -1,5 +1,5 @@
 // Signed session tokens (JWT, HS256) in an HttpOnly cookie. Used by proxy.ts, route handlers and server components.
-// Claims: sub = user id, isAdmin, email, name, tv = the user's token_version (bumping it in the DB revokes every
+// Claims: userId (also in the standard sub), isAdmin, email, name, tv = the user's token_version (bumping it in the DB revokes every
 // token issued before), plus iss/aud/iat/exp. Verifying needs only the secret - no database round trip.
 import { jwtVerify, SignJWT } from "jose";
 import { settings } from "./config";
@@ -9,7 +9,7 @@ export const SESSION_DAYS = 7;
 const ISSUER = "kissaprints";
 const AUDIENCE = "kissaprints-web";
 
-export type SessionClaims = { sub: string; isAdmin: boolean; email: string; name: string; tv: number };
+export type SessionClaims = { sub: string; userId: string; isAdmin: boolean; email: string; name: string; tv: number };
 export type SessionUser = { id: string; email: string; name: string; is_admin: boolean; token_version: number };
 
 const key = () => {
@@ -20,7 +20,7 @@ const key = () => {
 export async function signSession(user: SessionUser): Promise<string> {
   const k = key();
   if (!k) throw new Error("JWT_SECRET is not configured");
-  return new SignJWT({ isAdmin: user.is_admin, email: user.email, name: user.name, tv: user.token_version })
+  return new SignJWT({ userId: user.id, isAdmin: user.is_admin, email: user.email, name: user.name, tv: user.token_version })
     .setProtectedHeader({ alg: "HS256", typ: "JWT" })
     .setSubject(user.id).setIssuer(ISSUER).setAudience(AUDIENCE)
     .setIssuedAt().setExpirationTime(`${SESSION_DAYS}d`)
@@ -33,9 +33,10 @@ export async function verifySession(token: string | undefined | null): Promise<S
   if (!token || !k) return null;
   try {
     const { payload } = await jwtVerify(token, k, { issuer: ISSUER, audience: AUDIENCE, algorithms: ["HS256"] });
-    const { sub, isAdmin, email, name, tv } = payload as Record<string, unknown>;
+    const { sub, userId, isAdmin, email, name, tv } = payload as Record<string, unknown>;
     if (typeof sub !== "string" || typeof isAdmin !== "boolean" || typeof email !== "string" || typeof tv !== "number") return null;
-    return { sub, isAdmin, email, name: typeof name === "string" ? name : "", tv };
+    if (userId !== undefined && userId !== sub) return null; // both name the same user, or the token is wrong
+    return { sub, userId: sub, isAdmin, email, name: typeof name === "string" ? name : "", tv };
   } catch {
     return null; // bad signature, expired, wrong issuer/audience, malformed
   }

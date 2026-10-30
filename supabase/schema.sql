@@ -54,6 +54,16 @@ create index if not exists orders_status_idx on public.orders (status);
 create index if not exists orders_updated_at_idx on public.orders (updated_at desc);  -- the dashboard's 30-second "anything new?" check
 create index if not exists orders_user_id_idx on public.orders (user_id);
 
+-- ---------------------------------------------------------------- cart + wishlist
+-- Saved to the account, so nothing about the shopper is kept in the browser (no localStorage) and the cart follows
+-- them to any device. The checkout re-prices and re-checks every line, so a stale cart can never under-charge.
+create table if not exists public.carts (
+  user_id     uuid primary key references public.users (id) on delete cascade,
+  items       jsonb not null default '[]'::jsonb,
+  wishlist    jsonb not null default '[]'::jsonb,
+  updated_at  timestamptz not null default now()
+);
+
 -- ---------------------------------------------------------------- product visibility
 -- Set from /admin/products/. Products without a row are on the website; hidden ones disappear from every page
 -- and can't be ordered (e.g. out of stock). The catalog itself (names, prices) lives in src/data/catalog.json.
@@ -68,12 +78,15 @@ create table if not exists public.product_settings (
 alter table public.users enable row level security;
 alter table public.orders enable row level security;
 alter table public.product_settings enable row level security;
+alter table public.carts enable row level security;
 revoke all on table public.users from anon, authenticated;
 revoke all on table public.orders from anon, authenticated;
 revoke all on table public.product_settings from anon, authenticated;
+revoke all on table public.carts from anon, authenticated;
 grant select, insert, update, delete on table public.users to service_role;
 grant select, insert, update, delete on table public.orders to service_role;
 grant select, insert, update, delete on table public.product_settings to service_role;
+grant select, insert, update, delete on table public.carts to service_role;
 
 -- ---------------------------------------------------------------- photos
 -- Private bucket for customer photos (25 MB max, photos only). Uploads use one-time signed URLs.

@@ -1,12 +1,16 @@
 "use client";
-// Client-side shop state: cart (localStorage "kp-cart2", read by checkout too), which dialog is open, the toast
-// and the wishlist. Everything else on the page stays server-rendered.
+// Client-side shop state: the cart and wishlist (kept on the shopper's account via /api/cart/ - nothing is stored in
+// the browser), whether they're signed in, which dialog is open and the toast. Everything else stays server-rendered.
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { api, type ApiError } from "@/lib/client-api";
+import type { Layout } from "@/lib/magazine";
 
 export type CartPhoto = { key: string; name: string; size: number };
 export type CartItem = {
   id: string; slug: string; name: string; image: string; price: number; qty: number;
   options: string; opts: Record<string, string>; note: string; photos: CartPhoto[]; need: number;
+  /** Designed products (the magazine): which photo goes in which spot. */
+  layout?: Layout;
 };
 
 type Shop = {
@@ -23,17 +27,20 @@ type Shop = {
   toast: { message: string; seq: number } | null;
   say: (message: string) => void;
   wish: Set<string>;
+  /** false (and nothing changes) when signed out - the wishlist lives on the account. */
   toggleWish: (slug: string) => boolean;
+  /** "out" = signed out: personalising and ordering need an account. */
+  account: "loading" | "in" | "out";
+  /** After checkout: empty the cart on the account before leaving the page. */
+  clearCart: () => Promise<void>;
   freeShipOver: number;
 };
 
 const ShopContext = createContext<Shop | null>(null);
-export const CART_KEY = "kp-cart2";
-
-const read = <T,>(key: string, fallback: T): T => {
-  try { return (JSON.parse(localStorage.getItem(key) || "null") as T) ?? fallback; } catch { return fallback; }
-};
-const write = (key: string, value: unknown) => { try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* private mode */ } };
+// What earlier versions kept in localStorage (cart, wishlist, checkout details) - wiped on load.
+const OLD_KEYS = ["kp-cart", "kp-cart2", "kp-wish", "kp-checkout"];
+type CartRes = { signedIn: boolean; items: CartItem[]; wishlist: string[] };
+const loginHere = () => location.assign(`/login/?next=${encodeURIComponent(location.pathname + location.search)}`);
 
 export function ShopProvider({ freeShipOver, children }: { freeShipOver: number; children: React.ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -42,22 +49,47 @@ export function ShopProvider({ freeShipOver, children }: { freeShipOver: number;
   const [openDialogEl, setOpenDialogEl] = useState<HTMLDialogElement | null>(null);
   const [toast, setToast] = useState<Shop["toast"]>(null);
   const [wish, setWish] = useState<Set<string>>(new Set());
-  const loaded = useRef(false);
+  const [account, setAccount] = useState<Shop["account"]>("loading");
+  const saving = useRef<Promise<unknown>>(Promise.resolve());
+  const cartRef = useRef<CartItem[]>([]);
+  const dirty = useRef(false);
 
-  // localStorage is read after mount, so server and first client render match (no hydration mismatch).
-  useEffect(() => {
-    localStorage.removeItem("kp-cart"); // format before structured options existed
-    setCart(read<CartItem[]>(CART_KEY, []));
-    setWish(new Set(read<string[]>("kp-wish", [])));
-    loaded.current = true;
-    const sync = (e: StorageEvent) => { if (e.key === CART_KEY) setCart(read<CartItem[]>(CART_KEY, [])); };
-    window.addEventListener("storage", sync); // keep several open tabs in step
-    return () => window.removeEventListener("storage", sync);
+  // Load the account's cart after mount (so server and first client render match). 401 = the session just ended.
+  const load = useCallback(() => {
+    if (dirty.current) return; // a save is on its way; don't overwrite it with older data
+    api<CartRes>("/api/cart/").then((r) => { cartRef.current = r.items; setCart(r.items); setWish(new Set(r.wishlist)); setAccount(r.signedIn ? "in" : "out"); })
+      .catch((err) => { if ((err as ApiError).status === 401) { cartRef.current = []; setCart([]); setWish(new Set()); setAccount("out"); } });
   }, []);
-  useEffect(() => { if (loaded.current) write(CART_KEY, cart); }, [cart]);
+  useEffect(() => {
+    try { OLD_KEYS.forEach((k) => localStorage.removeItem(k)); } catch { /* storage blocked */ }
+    load();
+    const again = () => { if (document.visibilityState === "visible") load(); }; // keep several open tabs in step
+    document.addEventListener("visibilitychange", again);
+    return () => document.removeEventListener("visibilitychange", again);
+  }, [load]);
+
+  const seq = useRef(0);
+  const say = useCallback((message: string) => setToast({ message, seq: ++seq.current }), []);
+  // Every change goes to the account, one request at a time, latest last.
+  const save = useCallback((changes: { items?: CartItem[]; wishlist?: string[] }) => {
+    dirty.current = true;
+    const run = saving.current.then(() => api("/api/cart/", changes, { method: "PUT" })).catch((err) => {
+      if ((err as ApiError).status === 401) setAccount("out");
+      else say("Couldn't save your cart just now - please try again"); // never fail silently
+    }).finally(() => { if (saving.current === run) dirty.current = false; });
+    saving.current = run;
+    return run;
+  }, [say]);
+  const change = useCallback((fn: (c: CartItem[]) => CartItem[]) => {
+    const next = fn(cartRef.current);
+    cartRef.current = next;
+    setCart(next);
+    void save({ items: next });
+  }, [save]);
 
   const addToCart = useCallback((item: Omit<CartItem, "id">) => {
-    setCart((current) => {
+    if (account === "out") { loginHere(); return; }
+    change((current) => {
       // Lines with photos stay separate: each one is its own personalised design.
       const same = !item.photos.length && current.findIndex((c) => c.slug === item.slug && c.options === item.options && !c.photos?.length);
       if (same !== false && same >= 0) return current.map((c, i) => (i === same ? { ...c, qty: Math.min(20, c.qty + item.qty) } : c));
@@ -65,14 +97,13 @@ export function ShopProvider({ freeShipOver, children }: { freeShipOver: number;
     });
     setBump((b) => b + 1);
     setDialog("cart-drawer");
-  }, []);
+  }, [account, change]);
   const setQty = useCallback((index: number, qty: number) => {
-    setCart((current) => current.map((c, i) => (i === index ? { ...c, qty: Math.min(20, Math.max(1, qty)) } : c)));
-  }, []);
-  const removeLine = useCallback((index: number) => setCart((current) => current.filter((_, i) => i !== index)), []);
+    change((current) => current.map((c, i) => (i === index ? { ...c, qty: Math.min(20, Math.max(1, qty)) } : c)));
+  }, [change]);
+  const removeLine = useCallback((index: number) => change((current) => current.filter((_, i) => i !== index)), [change]);
+  const clearCart = useCallback(async () => { cartRef.current = []; setCart([]); await save({ items: [] }); }, [save]);
 
-  const seq = useRef(0);
-  const say = useCallback((message: string) => setToast({ message, seq: ++seq.current }), []);
   useEffect(() => {
     if (!toast) return;
     const t = setTimeout(() => setToast(null), 2800);
@@ -80,19 +111,20 @@ export function ShopProvider({ freeShipOver, children }: { freeShipOver: number;
   }, [toast]);
 
   const toggleWish = useCallback((slug: string) => {
+    if (account !== "in") return false;
     const next = new Set(wish);
     const added = !next.has(slug);
     if (added) next.add(slug);
     else next.delete(slug);
     setWish(next);
-    write("kp-wish", [...next]);
+    void save({ wishlist: [...next] });
     return added;
-  }, [wish]);
+  }, [wish, account, save]);
 
   const value = useMemo<Shop>(() => ({
     cart, addToCart, setQty, removeLine, bump, dialog, openDialog: setDialog, closeDialog: () => setDialog(null),
-    openDialogEl, setOpenDialogEl, toast, say, wish, toggleWish, freeShipOver,
-  }), [cart, addToCart, setQty, removeLine, bump, dialog, openDialogEl, toast, say, wish, toggleWish, freeShipOver]);
+    openDialogEl, setOpenDialogEl, toast, say, wish, toggleWish, account, clearCart, freeShipOver,
+  }), [cart, addToCart, setQty, removeLine, bump, dialog, openDialogEl, toast, say, wish, toggleWish, account, clearCart, freeShipOver]);
 
   return <ShopContext.Provider value={value}>{children}</ShopContext.Provider>;
 }
