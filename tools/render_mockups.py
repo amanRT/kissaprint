@@ -5,7 +5,7 @@ Usage:
     python tools/render_mockups.py star-map song-plaque
     python tools/render_mockups.py --grid-only      # just the preview sheet (design/renders/_grid.png)
 
-Output: src/static/assets/img/products/<scene>-<width>.{avif,webp} and src/data/images.json entries.
+Output: public/assets/img/products/<scene>-<width>.{avif,webp} and src/data/images.json entries.
 """
 import argparse
 import sys
@@ -22,7 +22,7 @@ from serve import start_background  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent
 DESIGN = ROOT / "design"
 RENDERS = DESIGN / "renders"
-OUT = ROOT / "src" / "static" / "assets" / "img" / "products"
+OUT = ROOT / "public" / "assets" / "img" / "products"
 WIDTHS = [120, 360, 640, 800, 1200]
 
 
@@ -86,7 +86,7 @@ def render_brand(driver, sid):
     png = RENDERS / f"{sid}.png"
     screenshot(driver, png, clip={"x": 0, "y": 0, "width": int(w), "height": int(h)})
     img = Image.open(png).convert("RGB")
-    static = ROOT / "src" / "static"
+    static = ROOT / "public"
     if sid == "og":
         out = static / "assets" / "img" / "og-default.jpg"
         img.save(out, "JPEG", quality=86, optimize=True, progressive=True)

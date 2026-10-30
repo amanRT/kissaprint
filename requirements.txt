@@ -1,2 +1,0 @@
-# Everything needed to build the site (this is all a hosting provider needs)
-Jinja2>=3.1

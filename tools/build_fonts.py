@@ -11,7 +11,7 @@ from fontTools.varLib import instancer
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "design" / "source-fonts"
-OUT = ROOT / "src" / "static" / "assets" / "fonts"
+OUT = ROOT / "src" / "fonts"
 
 # Basic Latin, Latin-1, dashes/quotes/bullets/ellipsis, rupee, arrows, trade mark, multiplication.
 UNICODES = (

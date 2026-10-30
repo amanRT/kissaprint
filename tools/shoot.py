@@ -6,7 +6,7 @@ Usage:
     python tools/shoot.py /products/song-plaque/ --full-sheet
 
 Screens go to qa/screens/ (git-ignored). Checks: console errors, horizontal overflow, broken images,
-images without alt text. Serves dist/ itself, so run tools/build.py first.
+images without alt text. Starts the built Next.js app itself, so run `npm run build` first.
 """
 import argparse
 import re
@@ -18,7 +18,7 @@ from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from browser import make_driver, screenshot, set_viewport, wait_ready  # noqa: E402
-from serve import start_background  # noqa: E402
+from nextserver import start_next  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "qa" / "screens"
@@ -138,7 +138,7 @@ def main():
     args = ap.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
     if args.interactions:
-        server, base = start_background(ROOT / "dist")
+        server, base = start_next()
         driver = make_driver()
         try:
             interactions(driver, base)
@@ -146,12 +146,12 @@ def main():
             print("console errors:", logs or "none")
         finally:
             driver.quit()
-            server.shutdown()
+            server.terminate()
         return
     for old in OUT.glob("*.png"):
         if any(old.name.startswith(slug(p) + "-") for p in args.pages):
             old.unlink()
-    server, base = start_background(ROOT / "dist")
+    server, base = start_next()
     driver = make_driver()
     problems = 0
     try:
@@ -171,7 +171,7 @@ def main():
                 print(f"{path:34} {vp:8} {n:2} frames, {total:5}px  " + ("OK" if not flag else " | ".join(flag)))
     finally:
         driver.quit()
-        server.shutdown()
+        server.terminate()
     print(f"screens -> {OUT}")
     sys.exit(1 if problems else 0)
 

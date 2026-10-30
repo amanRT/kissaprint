@@ -9,7 +9,7 @@ from PIL import Image, ImageOps
 
 ROOT = Path(__file__).resolve().parent.parent
 MANIFEST = ROOT / "src" / "data" / "images.json"
-STATIC = ROOT / "src" / "static"
+STATIC = ROOT / "public"
 
 
 def crop_to_aspect(img: Image.Image, aspect: float, focal=(0.5, 0.5), zoom=1.0) -> Image.Image:

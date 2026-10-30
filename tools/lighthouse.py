@@ -16,7 +16,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from serve import start_background  # noqa: E402
+from nextserver import start_next  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "qa" / "lighthouse"
@@ -42,7 +42,7 @@ def main():
         sys.exit("Lighthouse not installed - run `npm install` in the project root first.")
     node = find_node()
     OUT.mkdir(parents=True, exist_ok=True)
-    server, base = start_background(ROOT / "dist")
+    server, base = start_next()
     factors = ["mobile", "desktop"] if args.form_factor == "both" else [args.form_factor]
     worst = 100
     try:
@@ -68,7 +68,7 @@ def main():
                         if ref.get("weight", 0) > 0 and audit.get("score") is not None and audit["score"] < 0.9:
                             print(f"      ! {cat_id:15} {audit['id']}: {audit['title']} {audit.get('displayValue', '')}")
     finally:
-        server.shutdown()
+        server.terminate()
     print(f"reports -> {OUT}   (lowest score: {worst})")
 
 

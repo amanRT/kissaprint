@@ -123,6 +123,7 @@
  "gift-box": {
   "src": "/assets/img/photos/gift-box",
   "widths": [
+   160,
    360,
    640
   ],
@@ -278,6 +279,7 @@
  "pola-couple": {
   "src": "/assets/img/photos/pola-couple",
   "widths": [
+   160,
    280,
    560
   ],
@@ -288,6 +290,7 @@
  "pola-family": {
   "src": "/assets/img/photos/pola-family",
   "widths": [
+   160,
    280,
    560
   ],
@@ -298,6 +301,7 @@
  "pola-friends": {
   "src": "/assets/img/photos/pola-friends",
   "widths": [
+   160,
    280,
    560
   ],
@@ -308,6 +312,7 @@
  "pola-holi": {
   "src": "/assets/img/photos/pola-holi",
   "widths": [
+   160,
    280,
    560
   ],
@@ -318,6 +323,7 @@
  "pola-pet": {
   "src": "/assets/img/photos/pola-pet",
   "widths": [
+   160,
    280,
    560
   ],
@@ -328,6 +334,7 @@
  "pola-sunset": {
   "src": "/assets/img/photos/pola-sunset",
   "widths": [
+   160,
    280,
    560
   ],
@@ -364,6 +371,7 @@
  "ugc-bedroom": {
   "src": "/assets/img/photos/ugc-bedroom",
   "widths": [
+   160,
    300,
    560
   ],
@@ -374,6 +382,7 @@
  "ugc-frames": {
   "src": "/assets/img/photos/ugc-frames",
   "widths": [
+   160,
    300,
    560
   ],
@@ -384,6 +393,7 @@
  "ugc-hand": {
   "src": "/assets/img/photos/ugc-hand",
   "widths": [
+   160,
    300,
    560
   ],
@@ -394,6 +404,7 @@
  "ugc-hanging": {
   "src": "/assets/img/photos/ugc-hanging",
   "widths": [
+   160,
    300,
    560
   ],
@@ -404,6 +415,7 @@
  "ugc-instax": {
   "src": "/assets/img/photos/ugc-instax",
   "widths": [
+   160,
    300,
    560
   ],
@@ -414,6 +426,7 @@
  "ugc-table": {
   "src": "/assets/img/photos/ugc-table",
   "widths": [
+   160,
    300,
    560
   ],
@@ -424,6 +437,7 @@
  "ugc-wall": {
   "src": "/assets/img/photos/ugc-wall",
   "widths": [
+   160,
    300,
    560
   ],
@@ -434,6 +448,7 @@
  "ugc-yellow": {
   "src": "/assets/img/photos/ugc-yellow",
   "widths": [
+   160,
    300,
    560
   ],
